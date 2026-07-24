@@ -36,7 +36,8 @@
                 android:gravity="center"
                 android:text="@string/paper_wallet_public_label"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:textColor="?android:attr/textColorPrimary" 
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/paper_wallet_key_label"
@@ -46,7 +47,8 @@
                 android:gravity="center"
                 android:text="@string/paper_wallet_private_label"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:textColor="?android:attr/textColorPrimary"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
