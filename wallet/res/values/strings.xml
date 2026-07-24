@@ -430,7 +430,7 @@
 <!-- BIP38 encryption -->
 <string name="paper_wallet_encrypt_bip38">Encrypt BIP38</string>
 <string name="paper_wallet_passphrase">Encryption passphrase</string>
-<string name="paper_wallet_passphrase_confirm">Confirm passphrase</string>
+<string name="paper_wallet_passphrase_confirm">Confirm encryption passphrase</string>
 <string name="paper_wallet_passphrase_empty">Passphrase is empty</string>
 <string name="paper_wallet_passphrase_mismatch">Passphrases do not match</string>
 <string name="paper_wallet_encrypting_bip38">Encrypting BIP38...</string>
