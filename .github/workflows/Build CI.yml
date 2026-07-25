@@ -1,4 +1,4 @@
-name: Build Bitcoin Wallet v11 - Gradle Build
+name: Build Bitcoin Wallet v11 - CI Build
 
 on:
   workflow_dispatch:  # Manual trigger only
@@ -288,7 +288,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v6.0.0
         with:
-          name: apk-v11-signed-gradle
+          name: apk-v11.04-signed-CI
           path: |
             signed/*.apk
             report.txt
