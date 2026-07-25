@@ -531,7 +531,6 @@
 <string name="tx_details_sent_details">Chi tiết đã gửi</string>
 <string name="tx_details_received_details">Chi tiết đã nhận</string>
 <string name="tx_details_transaction_id">Mã giao dịch</string>
-<string name="tx_details_tap_to_copy">Chạm để sao chép</string>
 
 <string name="tx_details_unknown">không xác định</string>
 <string name="tx_details_fetching">P2TR ngoại lai (đang tải…)</string>
