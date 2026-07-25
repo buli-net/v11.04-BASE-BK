@@ -104,7 +104,6 @@ public class TransactionDetailsActivity extends Activity {
     private TextView tvActualFrom, tvActualTo;
     private ImageView ivQr;
     private Bitmap currentQrBitmap;
-    private TextView tvTxidCopy;
 
     private Transaction tx;
     private Wallet wallet;
@@ -160,7 +159,6 @@ public class TransactionDetailsActivity extends Activity {
         tvActualFrom = findViewById(R.id.tv_actual_from);
         tvActualTo = findViewById(R.id.tv_actual_to);
         ivQr = findViewById(R.id.iv_tx_qr);
-        tvTxidCopy = findViewById(R.id.tv_txid_copy);
 
         if (tvStatus != null) { tvStatus.setGravity(Gravity.END); tvStatus.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
         if (tvFee != null) { tvFee.setGravity(Gravity.END); tvFee.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
@@ -728,7 +726,6 @@ public class TransactionDetailsActivity extends Activity {
 
     private void setupQr() {
         if (ivQr != null) ivQr.setOnClickListener(v -> showQrDialog());
-        if (tvTxidCopy != null) tvTxidCopy.setVisibility(View.GONE);
     }
 
     private String buildLiveTxText() {
