@@ -385,10 +385,10 @@
 <!-- Title of paper wallet screen -->
 <string name="paper_wallet_activity_title">Create paper wallet</string>
 <!-- Warning text shown on top of paper wallet -->
-<string name="paper_wallet_warning">WARNING: Paper wallet contains the private key. Anyone with this key can spend all coins. Do not share, do not screenshot to others. Print and store in safe place.</string>
+<string name="paper_wallet_warning">WARNING: Paper wallet contains the private key. Anyone with this key can spend all coins. Print and store in safe place.</string>
 
 <!-- Labels -->
-<string name="paper_wallet_public_label">Public Address</string>
+<string name="paper_wallet_public_label">Public Key</string>
 <string name="paper_wallet_private_label">Private Key</string>
 <!-- Shown when address/key is hidden -->
 <string name="paper_wallet_hidden">••••••••••••••••••••••••</string>
@@ -403,8 +403,6 @@
 <string name="paper_wallet_show_key">Show</string>
 
 <!-- Public address formats - ONLY sweepable by original wallet -->
-<!-- 0 = Legacy uncompressed P2PKH 1... WIF 5... -->
-<string name="paper_wallet_public_format_legacy_uncomp">Legacy-U</string>
 <!-- 1 = Legacy compressed P2PKH 1... WIF K/L... -->
 <string name="paper_wallet_public_format_legacy">Legacy-C</string>
 <!-- 2 = Native SegWit Bech32 P2WPKH bc1q... - sweepable by original -->
