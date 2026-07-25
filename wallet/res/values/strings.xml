@@ -531,7 +531,6 @@
 <string name="tx_details_sent_details">Sent Details</string>
 <string name="tx_details_received_details">Received Details</string>
 <string name="tx_details_transaction_id">Transaction ID</string>
-<string name="tx_details_tap_to_copy">Tap to copy</string>
 
 <string name="tx_details_unknown">unknown</string>
 <string name="tx_details_fetching">P2TR external (fetching…)</string>
