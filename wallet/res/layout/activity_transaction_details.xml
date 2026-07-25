@@ -464,18 +464,6 @@
                         android:layout_height="wrap_content"
                         />
 
-                    <TextView
-                        android:id="@+id/tv_txid_copy"
-                        android:text="@string/tx_details_tap_to_copy"
-                        android:textColor="@color/tx_text_secondary"
-                        android:textSize="12sp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:layout_marginTop="4dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
