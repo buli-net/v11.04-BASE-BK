@@ -542,9 +542,9 @@
 <string name="tx_details_type_p2pkh">P2PKH</string>
 <string name="tx_details_type_op_return">OP_RETURN</string>
 <string name="tx_details_type_nonstandard">không chuẩn</string>
-<string name="tx_details_btc_suffix"> BTC</string>
+<string name="tx_details_btc_suffix">\u0020BTC</string>
 <string name="tx_details_dash">—</string>
-<string name="tx_details_fee_rate_suffix"> sat/vB</string>
+<string name="tx_details_fee_rate_suffix">\u0020sat/vB</string>
 	
 <!-- end TransactionDetailsActivity -->
     
