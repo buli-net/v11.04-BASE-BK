@@ -457,137 +457,107 @@
 <string name="paper_wallet_options_print">Print</string>
 <string name="paper_wallet_options_export">Export TXT</string>
 
-    <!-- TransactionDetailsActivity -->
-     <!-- wallet/src/wallet/ui/TransactionDetailsActivity.java -->
-<string name="tx_details_title">Transaction Details</string>
-<string name="tx_details_missing_txid">Missing txid</string>
-<string name="tx_details_wallet_not_ready">Wallet not ready</string>
-<string name="tx_details_transaction_not_found">Transaction not found</string>
-<string name="tx_details_sent">Sent</string>
-<string name="tx_details_received">Received</string>
-<string name="tx_details_status_pending">Pending</string>
-<string name="tx_details_status_building">Building</string>
-<string name="tx_details_status_confirmed">Confirmed</string>
-<string name="tx_details_unconfirmed">Unconfirmed</string>
-<string name="tx_details_confirmations_value">%1$d confirmations · height %2$d</string>
-<string name="tx_details_total_from">Total: %1$s BTC from %2$d</string>
-<string name="tx_details_total_to">Total: %1$s BTC to %2$d</string>
-<string name="tx_details_copied">Copied</string>
-<string name="tx_details_save">Save</string>
-<string name="tx_details_share">Share</string>
-<string name="tx_details_explore">Explore</string>
-<string name="tx_details_save_failed">Save failed</string>
-<string name="tx_details_saved_to_pictures">Saved to Pictures/WalletQR</string>
-<string name="tx_details_save_failed_msg">Save failed: %s</string>
-<string name="tx_details_share_tx">Share transaction</string>
-<string name="tx_details_no_browser">No browser found</string>
+<!-- TransactionDetailsActivity - wallet/src/wallet/ui/TransactionDetailsActivity.java -->
+    <string name="tx_details_title">Transaction Details</string>
+    <string name="tx_details_missing_txid">Missing transaction id</string>
+    <string name="tx_details_wallet_not_ready">Wallet not ready</string>
+    <string name="tx_details_transaction_not_found">Transaction not found</string>
 
-    <!-- qr copy txt-->
+    <!-- direction / amount -->
+    <string name="tx_details_sent">Sent</string>
+    <string name="tx_details_received">Received</string>
+    <string name="tx_details_prefix_sent">-</string>
+    <string name="tx_details_prefix_received">+</string>
 
-<string name="qr_direction">Direction</string>
-<string name="qr_amount">Amount</string>
-<string name="qr_sender_receiver">Sender / Receiver</string>
-<string name="qr_from">From</string>
-<string name="qr_to">To</string>
-<string name="qr_tx_details">Transaction details</string>
-<string name="qr_status">Status</string>
-<string name="qr_fee">Fee</string>
-<string name="qr_size_weight">Size / Weight</string>
-<string name="qr_confirmations">Confirmations</string>
-<string name="qr_time">Time</string>
-    
-<string name="qr_age">Age</string>
-<string name="qr_ago">ago</string>
-<string name="qr_year">year</string>
-<string name="qr_years">years</string>
-<string name="qr_month">month</string>
-<string name="qr_months">months</string>
-<string name="qr_day">day</string>
-<string name="qr_days">days</string>
-<string name="qr_hour">hour</string>
-<string name="qr_hours">hours</string>
-<string name="qr_minute">minute</string>
-<string name="qr_minutes">minutes</string>
-<string name="qr_second">second</string>
-<string name="qr_seconds">seconds</string>
-    
-<string name="qr_sent_details">Sent Details</string>
-<string name="qr_received_details">Received Details</string>
-<string name="qr_txid">Transaction ID</string>
+    <!-- status -->
+    <string name="tx_details_status_pending">Pending</string>
+    <string name="tx_details_status_building">Building</string>
+    <string name="tx_details_status_confirmed">Confirmed</string>
+    <string name="tx_details_unconfirmed">Unconfirmed</string>
+    <string name="tx_details_confirmations_value">%1$d confirmations · height %2$d</string>
 
-      <!-- wallet/res/layout/activity_transaction_details.xml -->
+    <!-- layout labels - wallet/res/layout/activity_transaction_details.xml -->
+    <string name="tx_details_qr_desc">Transaction QR</string>
+    <string name="tx_details_sender_receiver">Sender / Receiver</string>
+    <string name="tx_details_from">From</string>
+    <string name="tx_details_to">To</string>
+    <string name="tx_details_transaction_details">Transaction details</string>
+    <string name="tx_details_status">Status</string>
+    <string name="tx_details_fee">Fee</string>
+    <string name="tx_details_size_weight">Size / Weight</string>
+    <string name="tx_details_confirmations">Confirmations</string>
+    <string name="tx_details_time">Time</string>
+    <string name="tx_details_age">Age</string>
+    <string name="tx_details_sent_details">Sent Details</string>
+    <string name="tx_details_received_details">Received Details</string>
+    <string name="tx_details_transaction_id">Transaction ID</string>
 
-<string name="tx_details_qr_desc">Transaction QR</string>
-<string name="tx_details_sender_receiver">Sender / Receiver</string>
-<string name="tx_details_from">From</string>
-<string name="tx_details_to">To</string>
-<string name="tx_details_transaction_details">Transaction details</string>
-<string name="tx_details_status">Status</string>
-<string name="tx_details_fee">Fee</string>
-<string name="tx_details_size_weight">Size / Weight</string>
-<string name="tx_details_confirmations">Confirmations</string>
-<string name="tx_details_time">Time</string>
-<string name="tx_details_age">Age</string>
-<string name="tx_details_sent_details">Sent Details</string>
-<string name="tx_details_received_details">Received Details</string>
-<string name="tx_details_transaction_id">Transaction ID</string>
+    <!-- inputs / outputs formatting -->
+    <string name="tx_details_total_from">Total from (%1$s BTC, %2$d inputs):</string>
+    <string name="tx_details_total_to">Total to (%1$s BTC, %2$d outputs):</string>
+    <string name="tx_details_io_format">%1$s (%2$s) - %3$s</string>
 
-<string name="tx_details_unknown">unknown</string>
-<string name="tx_details_fetching">unknown (fetching…)</string>
-<string name="tx_details_type_p2wpkh">P2WPKH</string>
-<string name="tx_details_type_p2tr">P2TR</string>
-<string name="tx_details_type_p2wsh">P2WSH</string>
-<string name="tx_details_type_p2sh">P2SH</string>
-<string name="tx_details_type_p2pkh">P2PKH</string>
-<string name="tx_details_type_op_return">OP_RETURN</string>
-<string name="tx_details_type_nonstandard">nonstandard</string>
-<string name="tx_details_btc_suffix">\u0020BTC</string>
-<string name="tx_details_dash">—</string>
-<string name="tx_details_fee_rate_suffix">\u0020sat/vB</string>
+    <!-- types - supports all address types -->
+    <string name="tx_details_unknown">unknown</string>
+    <string name="tx_details_fetching">external (fetching…)</string>
+    <string name="tx_details_type_p2wpkh">P2WPKH</string>
+    <string name="tx_details_type_p2tr">P2TR</string>
+    <string name="tx_details_type_p2wsh">P2WSH</string>
+    <string name="tx_details_type_p2sh">P2SH</string>
+    <string name="tx_details_type_p2pkh">P2PKH</string>
+    <string name="tx_details_type_op_return">OP_RETURN</string>
+    <string name="tx_details_type_nonstandard">nonstandard</string>
 
+    <!-- suffix / formatting -->
+    <string name="tx_details_btc_suffix">\u0020BTC</string>
+    <string name="tx_details_dash">—</string>
+    <string name="tx_details_fee_rate_suffix">\u0020sat/vB</string>
+    <string name="tx_details_size_format">%1$d bytes · %2$d wu</string>
+    <string name="tx_details_size_format_with_fee_rate">%1$d bytes · %2$d wu · %3$d%4$s</string>
+    <string name="tx_details_rbf_suffix"> · RBF</string>
 
-<!-- TransactionDetailsActivity - no hardcoded UI -->
-<string name="tx_details_title">Transaction Details</string>
-<string name="tx_details_missing_txid">Missing transaction id</string>
-<string name="tx_details_wallet_not_ready">Wallet not ready</string>
-<string name="tx_details_transaction_not_found">Transaction not found</string>
-<string name="tx_details_sent">Sent</string>
-<string name="tx_details_received">Received</string>
-<string name="tx_details_prefix_sent">-</string>
-<string name="tx_details_prefix_received">+</string>
-<string name="tx_details_btc_suffix">\u0020BTC</string>
-<string name="tx_details_dash">—</string>
-<string name="tx_details_unknown">unknown</string>
-<string name="tx_details_fetching">external (fetching…)</string>
-<string name="tx_details_type_p2wpkh">P2WPKH</string>
-<string name="tx_details_type_p2tr">P2TR</string>
-<string name="tx_details_type_p2wsh">P2WSH</string>
-<string name="tx_details_type_p2sh">P2SH</string>
-<string name="tx_details_type_p2pkh">P2PKH</string>
-<string name="tx_details_type_op_return">OP_RETURN</string>
-<string name="tx_details_type_nonstandard">nonstandard</string>
-<string name="tx_details_fee_rate_suffix">\u0020sat/vB</string>
-<string name="tx_details_size_format">%1$d bytes · %2$d wu</string>
-<string name="tx_details_size_format_with_fee_rate">%1$d bytes · %2$d wu · %3$d%4$s</string>
-<string name="tx_details_rbf_suffix"> · RBF</string>
-<string name="tx_details_total_from">Total from (%1$s BTC, %2$d inputs):</string>
-<string name="tx_details_total_to">Total to (%1$s BTC, %2$d outputs):</string>
-<string name="tx_details_io_format">%1$s (%2$s) - %3$s%4$s</string>
-<string name="tx_details_copied">Copied</string>
-<string name="tx_details_save">Save</string>
-<string name="tx_details_share">Share</string>
-<string name="tx_details_explore">Explore</string>
-<string name="tx_details_save_failed">Save failed</string>
-<string name="tx_details_saved_to_pictures">Saved to Pictures</string>
-<string name="tx_details_save_failed_msg">Save failed: %1$s</string>
-<string name="tx_details_share_tx">Share transaction</string>
-<string name="tx_details_no_browser">No browser found</string>
-<string name="tx_details_status_pending">Pending</string>
-<string name="tx_details_status_building">Building</string>
-<string name="tx_details_status_confirmed">Confirmed</string>
-<string name="tx_details_unconfirmed">Unconfirmed</string>
-<string name="tx_details_confirmations_value">%1$d confirmations (height %2$d)</string>
-    
+    <!-- actions -->
+    <string name="tx_details_copied">Copied</string>
+    <string name="tx_details_save">Save</string>
+    <string name="tx_details_share">Share</string>
+    <string name="tx_details_explore">Explore</string>
+    <string name="tx_details_save_failed">Save failed</string>
+    <string name="tx_details_saved_to_pictures">Saved to Pictures/WalletQR</string>
+    <string name="tx_details_save_failed_msg">Save failed: %1$s</string>
+    <string name="tx_details_share_tx">Share transaction</string>
+    <string name="tx_details_no_browser">No browser found</string>
+
+<!-- QR copy text - used in buildLiveTxText() -->
+    <string name="qr_direction">Direction</string>
+    <string name="qr_amount">Amount</string>
+    <string name="qr_sender_receiver">Sender / Receiver</string>
+    <string name="qr_from">From</string>
+    <string name="qr_to">To</string>
+    <string name="qr_tx_details">Transaction details</string>
+    <string name="qr_status">Status</string>
+    <string name="qr_fee">Fee</string>
+    <string name="qr_size_weight">Size / Weight</string>
+    <string name="qr_confirmations">Confirmations</string>
+    <string name="qr_time">Time</string>
+    <string name="qr_age">Age</string>
+    <string name="qr_sent_details">Sent Details</string>
+    <string name="qr_received_details">Received Details</string>
+    <string name="qr_txid">Transaction ID</string>
+
+    <!-- age formatting -->
+    <string name="qr_ago">ago</string>
+    <string name="qr_year">year</string>
+    <string name="qr_years">years</string>
+    <string name="qr_month">month</string>
+    <string name="qr_months">months</string>
+    <string name="qr_day">day</string>
+    <string name="qr_days">days</string>
+    <string name="qr_hour">hour</string>
+    <string name="qr_hours">hours</string>
+    <string name="qr_minute">minute</string>
+    <string name="qr_minutes">minutes</string>
+    <string name="qr_second">second</string>
+    <string name="qr_seconds">seconds</string>
 <!-- end TransactionDetailsActivity -->
     
 </resources>
