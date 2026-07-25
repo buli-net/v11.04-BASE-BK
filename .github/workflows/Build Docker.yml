@@ -144,7 +144,7 @@ jobs:
       - name: 10. Upload
         uses: actions/upload-artifact@v6.0.0
         with:
-          name: Full APK-v11.04-private-signed-docker
+          name: apk-v11.04-signed-docker
           path: |
             signed/*.apk
             report.txt
