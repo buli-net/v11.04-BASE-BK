@@ -1,4 +1,4 @@
-name: Build Bitcoin Wallet v11.04 - Docker
+name: Build Bitcoin Wallet v11 - Docker Build
 
 on:
   workflow_dispatch:
