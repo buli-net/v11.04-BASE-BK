@@ -707,7 +707,7 @@ public class TransactionDetailsActivity extends Activity {
     private void copyOnClick(TextView tv, String text) {
         if (tv == null) return;
         final String t = text == null ? "" : text;
-        if (t.isEmpty() || t.equals(getString(R.string.tx_details_dash)) || t.equals(getString(R.string.tx_details_fetching))) ) {
+        if (t.isEmpty() || t.equals(getString(R.string.tx_details_dash)) || t.equals(getString(R.string.tx_details_fetching))) {
             tv.setOnClickListener(null);
             return;
         }
