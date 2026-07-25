@@ -533,7 +533,7 @@
 <string name="tx_details_transaction_id">Transaction ID</string>
 
 <string name="tx_details_unknown">unknown</string>
-<string name="tx_details_fetching">P2TR external (fetching…)</string>
+<string name="tx_details_fetching">unknown (fetching…)</string>
 <string name="tx_details_type_p2wpkh">P2WPKH</string>
 <string name="tx_details_type_p2tr">P2TR</string>
 <string name="tx_details_type_p2wsh">P2WSH</string>
