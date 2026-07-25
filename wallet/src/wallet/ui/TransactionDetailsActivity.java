@@ -76,6 +76,11 @@ import org.bitcoinj.script.ScriptPattern;
 import org.bitcoinj.wallet.Wallet;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
