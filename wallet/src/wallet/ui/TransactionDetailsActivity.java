@@ -972,15 +972,11 @@ private void updateLiveQr() {
     // Setup accordion behavior like main wallet screen
 // Initial state: only header card is expanded, others collapsed showing only title
 // On click: expand full, change background to expanded color, collapse others
-private void setupExpandableCards() {
-    View scroll = findViewById(R.id.nested_scroll);
-    if (!(scroll instanceof ViewGroup)) return;
-    final ViewGroup container = (ViewGroup) ((ViewGroup) scroll).getChildAt(0);
-    
-    final View contentSender = findViewById(R.id.content_sender);
-    final View contentDetails = findViewById(R.id.content_tx_details);
-    final View contentIo = findViewById(R.id.content_io);
-    final View contentTxid = findViewById(R.id.content_txid);
+    private void setupExpandableCards() {
+    final View cSender = findViewById(R.id.content_sender);
+    final View cDetails = findViewById(R.id.content_tx_details);
+    final View cIo = findViewById(R.id.content_io);
+    final View cTxid = findViewById(R.id.content_txid);
 
     final androidx.cardview.widget.CardView cardSender = findViewById(R.id.card_sender);
     final androidx.cardview.widget.CardView cardDetails = findViewById(R.id.card_tx_details);
@@ -990,46 +986,96 @@ private void setupExpandableCards() {
     final int colorBg = getResources().getColor(R.color.tx_card_bg);
     final int colorExpanded = getResources().getColor(R.color.tx_card_expanded);
 
+    // Helper to trigger full-card foreground ripple manually
+    // So content click still shows ripple on parent CardView
+    View.OnClickListener triggerFullRipple = v -> {
+        View parent = (View) v.getParent();
+        while (parent != null && !(parent instanceof androidx.cardview.widget.CardView)) {
+            if (parent.getParent() instanceof View) {
+                parent = (View) parent.getParent();
+            } else break;
+        }
+        if (parent != null && parent.getForeground() != null) {
+            // Set hotspot to touch position for ripple origin
+            parent.getForeground().setHotspot(v.getX() + v.getLeft(), v.getY() + v.getTop());
+            parent.getForeground().setState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled});
+            parent.postDelayed(() -> parent.getForeground().setState(new int[]{}), 350);
+        }
+    };
+
+    // Toggle - only header triggers expand/collapse
     View.OnClickListener toggle = v -> {
         View target = null;
-        androidx.cardview.widget.CardView targetCard = null;
-        
-        if(v.getId()==R.id.header_sender) { target = contentSender; targetCard = cardSender; }
-        else if(v.getId()==R.id.header_tx_details) { target = contentDetails; targetCard = cardDetails; }
-        else if(v.getId()==R.id.header_io) { target = contentIo; targetCard = cardIo; }
-        else if(v.getId()==R.id.header_txid) { target = contentTxid; targetCard = cardTxid; }
-        if(target==null) return;
+        androidx.cardview.widget.CardView tCard = null;
 
-        boolean expand = target.getVisibility()!=View.VISIBLE;
+        int id = v.getId();
+        if (id == R.id.header_sender) { target = cSender; tCard = cardSender; }
+        else if (id == R.id.header_tx_details) { target = cDetails; tCard = cardDetails; }
+        else if (id == R.id.header_io) { target = cIo; tCard = cardIo; }
+        else if (id == R.id.header_txid) { target = cTxid; tCard = cardTxid; }
+        if (target == null) return;
 
-        contentSender.setVisibility(View.GONE);
-        contentDetails.setVisibility(View.GONE);
-        contentIo.setVisibility(View.GONE);
-        contentTxid.setVisibility(View.GONE);
-        
+        boolean expand = target.getVisibility() != View.VISIBLE;
+
+        // Collapse all
+        cSender.setVisibility(View.GONE);
+        cDetails.setVisibility(View.GONE);
+        cIo.setVisibility(View.GONE);
+        cTxid.setVisibility(View.GONE);
         cardSender.setCardBackgroundColor(colorBg);
         cardDetails.setCardBackgroundColor(colorBg);
         cardIo.setCardBackgroundColor(colorBg);
         cardTxid.setCardBackgroundColor(colorBg);
 
-        if(expand) {
+        // Expand selected
+        if (expand) {
             target.setVisibility(View.VISIBLE);
-            targetCard.setCardBackgroundColor(colorExpanded);
+            tCard.setCardBackgroundColor(colorExpanded);
         }
     };
-    
-    // Header click
+
+    // 1. Header click = full ripple (from CardView foreground) + toggle
     findViewById(R.id.header_sender).setOnClickListener(toggle);
     findViewById(R.id.header_tx_details).setOnClickListener(toggle);
     findViewById(R.id.header_io).setOnClickListener(toggle);
     findViewById(R.id.header_txid).setOnClickListener(toggle);
 
-    findViewById(R.id.ic_copy_sender).setOnClickListener(v -> copy(getTv(tvFrom) + "\n" + getTv(tvTo)));
-    findViewById(R.id.ic_copy_details).setOnClickListener(v -> copy(
-        getTv(tvStatus) + " | " + getTv(tvFee) + " | " + getTv(tvMeta)
-    ));
+    // 2. Content click = full ripple (manual trigger) + copy only, no toggle
+    cSender.setClickable(true);
+    cSender.setOnClickListener(v -> {
+        triggerFullRipple.onClick(v);
+        copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo));
+    });
+
+    cDetails.setClickable(true);
+    cDetails.setOnClickListener(v -> {
+        triggerFullRipple.onClick(v);
+        // Copy all details in this card
+        String text = getTv(tvStatus) + "\n" + getTv(tvFee) + "\n" + getTv(tvMeta) + "\n" + getTv(tvHeight);
+        copy(text);
+    });
+
+    cIo.setClickable(true);
+    cIo.setOnClickListener(v -> {
+        triggerFullRipple.onClick(v);
+        copy(getTv(tvFrom) + "\n\n" + getTv(tvTo));
+    });
+
+    cTxid.setClickable(true);
+    cTxid.setOnClickListener(v -> {
+        triggerFullRipple.onClick(v);
+        copy(getTv(tvTxid));
+    });
+
+    // 3. Copy icons - block parent ripple and copy
+    findViewById(R.id.ic_copy_sender).setOnClickListener(v -> copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo)));
+    findViewById(R.id.ic_copy_details).setOnClickListener(v -> copy(getTv(tvStatus) + " | " + getTv(tvFee) + " | " + getTv(tvMeta)));
     findViewById(R.id.ic_copy_io).setOnClickListener(v -> copy(getTv(tvFrom) + "\n\n" + getTv(tvTo)));
     findViewById(R.id.ic_copy_txid).setOnClickListener(v -> copy(getTv(tvTxid)));
+}
+
+private String getTv(TextView tv) {
+    return tv != null && tv.getText() != null ? tv.getText().toString() : "";
 }
     
     private void setupParallaxScroll() {
