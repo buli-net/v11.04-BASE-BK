@@ -528,6 +528,7 @@
 <string name="tx_details_confirmations">Số xác nhận</string>
 <string name="tx_details_time">Thời gian</string>
 <string name="tx_details_age">Tuổi</string>
+<string name="tx_details_send_receive_details">Chi tiết gửi / nhận</string>
 <string name="tx_details_sent_details">Chi tiết đã gửi</string>
 <string name="tx_details_received_details">Chi tiết đã nhận</string>
 <string name="tx_details_transaction_id">Mã giao dịch</string>
