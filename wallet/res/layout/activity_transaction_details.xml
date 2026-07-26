@@ -154,7 +154,7 @@
 
                     </LinearLayout>
 
-                    <!-- Collapsible content - FIXED: use foreground for ripple to keep card color -->
+                    <!-- Collapsible content -->
                     <LinearLayout
                         android:id="@+id/content_sender"
                         android:orientation="vertical"
@@ -162,9 +162,6 @@
                         android:paddingEnd="16dp"
                         android:paddingBottom="16dp"
                         android:visibility="gone"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -269,9 +266,6 @@
                         android:padding="16dp"
                         android:paddingTop="0dp"
                         android:visibility="gone"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -470,9 +464,6 @@
                         android:padding="16dp"
                         android:paddingTop="0dp"
                         android:visibility="gone"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -580,9 +571,6 @@
                         android:padding="16dp"
                         android:paddingTop="0dp"
                         android:visibility="gone"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
