@@ -13,5 +13,5 @@
     <color name="tx_card_expanded">#384050</color>
     
     <!-- bg qr show transaction -->
-    <color name="qr_background">#ffa0a8b0</color>  <!-- white -->
+    <color name="qr_background">#ffffffff</color>  <!-- white -->
 </resources>
