@@ -10,6 +10,8 @@
 
 package wallet.ui;
 
+// --- Android framework imports ---
+// Core Activity lifecycle, UI widgets, clipboard, media store, intents, graphics
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
@@ -38,6 +40,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// --- ZXing QR library ---
+// Used to encode transaction data into QR bitmaps with configurable error correction
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -45,6 +49,8 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
+// --- BitcoinJ core imports ---
+// Provides Transaction, Wallet, Address, Script handling
 import org.bitcoinj.base.Coin;
 import org.bitcoinj.base.Sha256Hash;
 import org.bitcoinj.core.NetworkParameters;
@@ -58,6 +64,8 @@ import org.bitcoinj.script.ScriptChunk;
 import org.bitcoinj.script.ScriptPattern;
 import org.bitcoinj.wallet.Wallet;
 
+// --- Java standard library ---
+// Networking for mempool.space, date formatting, collections
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -74,24 +82,42 @@ import java.util.Map;
 import wallet.R;
 import wallet.WalletApplication;
 
+/**
+ * Activity to display detailed information about a single Bitcoin transaction.
+ * Features:
+ * - Real-time status updates via TransactionConfidence listener
+ * - Live age counter ticking every second with real calendar accuracy
+ * - Live QR code that updates every second (contains age) and on chain changes
+ * - Offline address extraction from scriptSig / witness / connected outputs
+ * - Online fallback to mempool.space API for missing input addresses/values
+ * - Fee calculation from cached inputs
+ */
 public class TransactionDetailsActivity extends Activity {
 
+    // --- API endpoints ---
+    // Base URLs for mempool.space to fetch previous transaction details when offline data missing
     private static final String API_MAINNET = "https://mempool.space/api/tx/";
     private static final String API_SIGNET = "https://mempool.space/signet/api/tx/";
     private static final String API_TESTNET = "https://mempool.space/testnet/api/tx/";
-    private static final String API_CUSTOM = null;
+    private static final String API_CUSTOM = null; // Set to custom URL if user runs own mempool instance
 
+    // --- UI references ---
+    // TextViews for header, status, fee, time, meta, age, inputs/outputs, actual from/to
     private TextView tvDirection, tvAmount, tvStatus, tvFee, tvTime, tvHeight, tvMeta, tvTxid;
     private TextView tvAge;
     private TextView tvFrom, tvTo;
     private TextView tvActualFrom, tvActualTo;
-    private ImageView ivQr;
-    private Bitmap currentQrBitmap;
+    private ImageView ivQr; // Small transparent QR in layout
+    private Bitmap currentQrBitmap; // Cached big QR for save/share
 
+    // --- Wallet state ---
     private Transaction tx;
     private Wallet wallet;
     private NetworkParameters params;
 
+    // --- Confidence listener ---
+    // Triggered when transaction gets new confirmation / block appearance / depth changes
+    // Calls refreshLiveFields() to update status, height, age, and QR live
     private final TransactionConfidence.Listener confidenceListener = new TransactionConfidence.Listener() {
         @Override
         public void onConfidenceChanged(TransactionConfidence confidence, ChangeReason reason) {
@@ -99,20 +125,26 @@ public class TransactionDetailsActivity extends Activity {
         }
     };
 
+    // --- QR dialog ---
+    // Fullscreen dialog showing big QR, with save/share/explore actions
     private Dialog qrDialog;
     private ImageView qrDialogImageView;
 
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private final Handler ageHandler = new Handler(Looper.getMainLooper());
+    // --- Handlers for live updates ---
+    private final Handler mainHandler = new Handler(Looper.getMainLooper()); // UI thread posts from background
+    private final Handler ageHandler = new Handler(Looper.getMainLooper()); // Age ticker
+    // Runnable that fires every second, aligned to wall-clock second boundary (1000 - now%1000)
     private final Runnable ageRunnable = new Runnable() {
         @Override
         public void run() {
-            refreshLiveFields();
+            refreshLiveFields(); // Updates age text and QR
             long now = System.currentTimeMillis();
-            ageHandler.postDelayed(this, 1000 - (now % 1000));
+            ageHandler.postDelayed(this, 1000 - (now % 1000)); // Schedule next tick exactly on next second
         }
     };
 
+    // --- Caches for fetched inputs ---
+    // Map input index -> address / value / type fetched from mempool.space
     private final Map<Integer, String> inputAddressCache = new HashMap<>();
     private final Map<Integer, Coin> inputValueCache = new HashMap<>();
     private final Map<Integer, String> inputTypeCache = new HashMap<>();
@@ -120,14 +152,17 @@ public class TransactionDetailsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Inflate layout containing cards: header, sender/receiver, tx details, io, txid, qr
         setContentView(R.layout.activity_transaction_details);
 
+        // --- ActionBar setup ---
         ActionBar ab = getActionBar();
         if (ab!= null) {
             ab.setDisplayHomeAsUpEnabled(true);
             ab.setTitle(R.string.tx_details_title);
         }
 
+        // --- Find all views ---
         tvDirection = findViewById(R.id.tv_direction);
         tvAmount = findViewById(R.id.tv_amount);
         tvStatus = findViewById(R.id.tv_status);
@@ -143,6 +178,7 @@ public class TransactionDetailsActivity extends Activity {
         tvActualTo = findViewById(R.id.tv_actual_to);
         ivQr = findViewById(R.id.iv_tx_qr);
 
+        // --- Right-align detail fields for consistent column layout ---
         if (tvStatus!= null) { tvStatus.setGravity(Gravity.END); tvStatus.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
         if (tvFee!= null) { tvFee.setGravity(Gravity.END); tvFee.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
         if (tvTime!= null) { tvTime.setGravity(Gravity.END); tvTime.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
@@ -150,6 +186,7 @@ public class TransactionDetailsActivity extends Activity {
         if (tvMeta!= null) { tvMeta.setGravity(Gravity.END); tvMeta.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
         if (tvAge!= null) { tvAge.setGravity(Gravity.END); tvAge.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
 
+        // --- Get txid from intent ---
         String txidStr = getIntent().getStringExtra("txid");
         if (txidStr == null) {
             Toast.makeText(this, getString(R.string.tx_details_missing_txid), Toast.LENGTH_SHORT).show();
@@ -157,6 +194,7 @@ public class TransactionDetailsActivity extends Activity {
             return;
         }
 
+        // --- Load wallet ---
         WalletApplication app = (WalletApplication) getApplication();
         wallet = app.getWallet();
         if (wallet == null) {
@@ -166,6 +204,7 @@ public class TransactionDetailsActivity extends Activity {
         }
         params = wallet.getNetworkParameters();
 
+        // --- Load transaction from wallet by hash ---
         try {
             tx = wallet.getTransaction(Sha256Hash.wrap(txidStr));
         } catch (Exception e) {
@@ -177,6 +216,7 @@ public class TransactionDetailsActivity extends Activity {
             return;
         }
 
+        // --- Determine direction (sent/received) and amount ---
         Coin value = Coin.ZERO;
         try {
             Coin v = tx.getValue(wallet);
@@ -191,16 +231,20 @@ public class TransactionDetailsActivity extends Activity {
             tvAmount.setTextColor(getResources().getColor(isSend? R.color.tx_amount_sent : R.color.tx_amount_recv));
         } catch (Exception ignored) {}
 
+        // Initial live fields refresh (status, confirmations, age, QR)
         refreshLiveFields();
 
+        // --- Fee display (may be null if not all inputs known) ---
         Coin fee = null;
         try { fee = tx.getFee(); } catch (Exception ignored) {}
         tvFee.setText(fee!= null? fee.toPlainString() + getString(R.string.tx_details_btc_suffix) : getString(R.string.tx_details_dash));
 
+        // --- Time display ---
         Date updateTime = null;
         try { updateTime = tx.getUpdateTime(); } catch (Exception ignored) {}
         tvTime.setText(updateTime!= null? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(updateTime) : getString(R.string.tx_details_dash));
 
+        // --- Size / weight / RBF / fee rate ---
         int size = 0, weight = 0;
         boolean rbf = false;
         try { size = tx.getMessageSize(); } catch (Exception ignored) {}
@@ -215,6 +259,7 @@ public class TransactionDetailsActivity extends Activity {
         }
         tvMeta.setText(size + " bytes · " + weight + " wu" + feeRate + (rbf? " · RBF" : ""));
 
+        // --- Resolve actual from/to for header (mine vs foreign) ---
         String actualFrom = null;
         String actualTo = null;
         try {
@@ -245,23 +290,32 @@ public class TransactionDetailsActivity extends Activity {
         copyOnClick(tvActualFrom, actualFrom.equals(getString(R.string.tx_details_fetching))? "" : actualFrom);
         copyOnClick(tvActualTo, actualTo);
 
+        // If sender unknown, fetch first input from mempool.space
         if (isFetchingFrom) {
             TransactionInput firstIn = tx.getInputs().get(0);
             fetchSenderFromMempool(firstIn.getOutpoint().getHash().toString(), (int) firstIn.getOutpoint().getIndex(), 0, true);
         }
 
+        // Render full input/output lists
         renderInputsAndOutputs();
 
+        // --- TxID display ---
         String hash = tx.getTxId().toString();
         tvTxid.setText(hash);
         copyOnClick(tvTxid, hash);
 
+        // --- QR, parallax, expandable cards ---
         setupQr();
         updateLiveQr();
         setupParallaxScroll();
         setupExpandableCards();
     }
 
+    /**
+     * Render inputs and outputs section.
+     * For each input: try to get connected output (offline), else scriptSig/witness, else cached mempool data, else fetch.
+     * Calculates total from/to for header summary.
+     */
     private void renderInputsAndOutputs() {
         StringBuilder fromSb = new StringBuilder();
         Coin totalFrom = Coin.ZERO;
@@ -355,15 +409,17 @@ public class TransactionDetailsActivity extends Activity {
 
     @Override protected void onResume() {
         super.onResume();
+        // Register confidence listener for live status updates
         if (tx!= null && tx.getConfidence()!= null) tx.getConfidence().addEventListener(confidenceListener);
         refreshLiveFields();
-        ageHandler.post(ageRunnable);
+        ageHandler.post(ageRunnable); // Start second ticker
     }
 
     @Override protected void onPause() {
         super.onPause();
+        // Unregister to avoid leaks
         if (tx!= null && tx.getConfidence()!= null) tx.getConfidence().removeEventListener(confidenceListener);
-        ageHandler.removeCallbacks(ageRunnable);
+        ageHandler.removeCallbacks(ageRunnable); // Stop ticker
     }
 
     @Override public boolean onCreateOptionsMenu(Menu menu) {
@@ -372,6 +428,7 @@ public class TransactionDetailsActivity extends Activity {
     }
 
     @Override public boolean onPrepareOptionsMenu(Menu menu) {
+        // Tint action menu text to network significant color (post to decor view to ensure inflated)
         final int networkSignificantColor = getResources().getColor(R.color.fg_on_dark_bg_network_significant);
         final View decor = getWindow().getDecorView();
         decor.post(() -> {
@@ -411,6 +468,7 @@ public class TransactionDetailsActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    // --- Wallet helper: get connected output if wallet knows previous tx ---
     private TransactionOutput getConnectedOutput(TransactionInput in) {
         try {
             TransactionOutPoint outpoint = in.getOutpoint();
@@ -425,6 +483,7 @@ public class TransactionDetailsActivity extends Activity {
         return null;
     }
 
+    // --- Extract address from scriptSig (legacy P2PKH) by looking for pubkey push ---
     private String getAddressFromScriptSig(TransactionInput in) {
         try {
             Script scriptSig = in.getScriptSig();
@@ -451,6 +510,7 @@ public class TransactionDetailsActivity extends Activity {
         return null;
     }
 
+    // --- Extract address from witness (P2WPKH / P2TR) ---
     private String getAddressFromWitness(TransactionInput in, NetworkParameters params) {
         try {
             if (in.getWitness() == null) return null;
@@ -476,11 +536,13 @@ public class TransactionDetailsActivity extends Activity {
         return null;
     }
 
+    // --- Convert Script to address string using network params ---
     private String getAddressFromScript(Script script, NetworkParameters params) {
         if (script == null) return null;
         try { return script.getToAddress(params).toString(); } catch (Exception e) { return null; }
     }
 
+    // --- Determine address type label for UI (P2PKH, P2SH, P2WPKH, P2TR, OP_RETURN, etc.) ---
     private String getAddressType(String addr, Script script) {
         try {
             if (script!= null && ScriptPattern.isOpReturn(script)) return getString(R.string.tx_details_type_op_return);
@@ -494,6 +556,7 @@ public class TransactionDetailsActivity extends Activity {
         return getString(R.string.tx_details_type_nonstandard);
     }
 
+    // --- Offline input address resolution iterating over inputs, optionally filtering mine vs foreign ---
     private String getInputAddressOffline(Transaction tx, NetworkParameters params, Wallet wallet, Boolean mineOnly) {
         if (tx.getInputs() == null) return null;
         for (TransactionInput in : tx.getInputs()) {
@@ -530,6 +593,7 @@ public class TransactionDetailsActivity extends Activity {
         return null;
     }
 
+    // --- Offline output address resolution ---
     private String getOutputAddress(Transaction tx, NetworkParameters params, Wallet wallet, Boolean mineOnly) {
         if (tx.getOutputs() == null) return null;
         for (TransactionOutput out : tx.getOutputs()) {
@@ -546,6 +610,7 @@ public class TransactionDetailsActivity extends Activity {
         return null;
     }
 
+    // --- Choose mempool API base URL depending on network (mainnet/testnet/signet/regtest/custom) ---
     private String getMempoolBaseUrl() {
         if (API_CUSTOM!= null &&!API_CUSTOM.isEmpty()) {
             return API_CUSTOM.endsWith("/")? API_CUSTOM : API_CUSTOM + "/";
@@ -559,6 +624,10 @@ public class TransactionDetailsActivity extends Activity {
         } catch (Exception e) { return API_MAINNET; }
     }
 
+    /**
+     * Fetch previous tx from mempool.space API to obtain input address and value.
+     * Runs on background thread, parses JSON manually (no Gson to keep APK small), caches result, posts UI update.
+     */
     private void fetchSenderFromMempool(String prevTxId, int voutIndex, int inputPos, boolean updateActualFrom) {
         String base = getMempoolBaseUrl();
         if (base == null) return;
@@ -633,6 +702,7 @@ public class TransactionDetailsActivity extends Activity {
         }).start();
     }
 
+    // --- Recalculate fee if we now know all input values (offline or from cache) ---
     private void tryUpdateFee() {
         try {
             if (tx == null || tx.getInputs() == null || tx.getOutputs() == null) return;
@@ -680,6 +750,7 @@ public class TransactionDetailsActivity extends Activity {
         } catch (Exception ignored) {}
     }
 
+    // --- Make TextView copyable on click ---
     private void copyOnClick(TextView tv, String text) {
         if (tv == null) return;
         final String t = text == null? "" : text;
@@ -698,14 +769,17 @@ public class TransactionDetailsActivity extends Activity {
         } catch (Exception ignored) {}
     }
 
+    // --- Dark mode detection ---
     private boolean isDark() {
         return (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
     }
 
+    // --- QR setup ---
     private void setupQr() {
         if (ivQr!= null) ivQr.setOnClickListener(v -> showQrDialog());
     }
 
+    // --- Build full text that will be encoded into QR (live fields included) ---
     private String buildLiveTxText() {
         String ageStr = getTv(tvAge);
         return getString(R.string.qr_direction) + ": " + getTv(tvDirection) + "\n"
@@ -727,6 +801,7 @@ public class TransactionDetailsActivity extends Activity {
 
     private String getTv(TextView tv) { return tv!= null && tv.getText()!= null? tv.getText().toString() : ""; }
 
+    // --- Update both small transparent QR and big dialog QR if visible ---
     private void updateLiveQr() {
         try {
             String text = buildLiveTxText();
@@ -746,6 +821,7 @@ public class TransactionDetailsActivity extends Activity {
 
     private void copyFullTx() { copy(buildLiveTxText()); }
 
+    // --- Show fullscreen QR dialog with save/share/explore buttons ---
     private void showQrDialog() {
         boolean dark = isDark();
         int bgColor = dark? Color.BLACK : Color.WHITE;
@@ -807,6 +883,7 @@ public class TransactionDetailsActivity extends Activity {
         return col;
     }
 
+    // --- Save QR bitmap to Pictures/WalletQR using MediaStore API (scoped storage compatible) ---
     private void saveQrBitmap() {
         try {
             Bitmap bmp = currentQrBitmap;
@@ -854,6 +931,8 @@ public class TransactionDetailsActivity extends Activity {
         }
     }
 
+    // --- QR encoding helpers ---
+    // Standard black-on-white QR
     public static Bitmap encodeQr(String text, int size) throws WriterException {
         QRCodeWriter writer = new QRCodeWriter();
         Map<EncodeHintType, Object> hints = new HashMap<>();
@@ -867,6 +946,7 @@ public class TransactionDetailsActivity extends Activity {
         return bmp;
     }
 
+    // Transparent background QR for overlay on card (small icon)
     public static Bitmap encodeQrTransparent(String text, int size) throws WriterException {
         QRCodeWriter writer = new QRCodeWriter();
         Map<EncodeHintType, Object> hints = new HashMap<>();
@@ -881,39 +961,104 @@ public class TransactionDetailsActivity extends Activity {
         return bmp;
     }
 
+    /**
+     * Calculate real calendar age from txTime to now.
+     * Uses java.util.Calendar to respect real month lengths (28/29/30/31), leap years.
+     * Algorithm: incrementally add years/months/days/hours/minutes from 'then' to 'now' using Calendar.add()
+     * This guarantees correctness for edge cases like Jan 31 -> Feb 28/29, etc.
+     */
     private String formatAge(Date txTime) {
-        if (txTime == null) return getString(R.string.tx_details_dash);
+        // --- 1. Null guard ---
+        if (txTime == null) {
+            return getString(R.string.tx_details_dash);
+        }
+
+        // --- 2. Prepare calendar instances ---
         java.util.Calendar then = java.util.Calendar.getInstance();
         then.setTime(txTime);
         java.util.Calendar now = java.util.Calendar.getInstance();
-        int years = now.get(java.util.Calendar.YEAR) - then.get(java.util.Calendar.YEAR);
-        int months = now.get(java.util.Calendar.MONTH) - then.get(java.util.Calendar.MONTH);
-        int days = now.get(java.util.Calendar.DAY_OF_MONTH) - then.get(java.util.Calendar.DAY_OF_MONTH);
-        int hours = now.get(java.util.Calendar.HOUR_OF_DAY) - then.get(java.util.Calendar.HOUR_OF_DAY);
-        int minutes = now.get(java.util.Calendar.MINUTE) - then.get(java.util.Calendar.MINUTE);
-        int seconds = now.get(java.util.Calendar.SECOND) - then.get(java.util.Calendar.SECOND);
-        if (seconds < 0) { seconds += 60; minutes--; }
-        if (minutes < 0) { minutes += 60; hours--; }
-        if (hours < 0) { hours += 24; days--; }
-        if (days < 0) {
-            java.util.Calendar temp = (java.util.Calendar) now.clone();
-            temp.add(java.util.Calendar.MONTH, -1);
-            int daysInLastMonth = temp.getActualMaximum(java.util.Calendar.DAY_OF_MONTH);
-            days += daysInLastMonth;
-            months--;
+        java.util.Calendar cursor = (java.util.Calendar) then.clone();
+
+        // --- 3. Future tx safety ---
+        if (cursor.after(now)) {
+            return "0 " + getString(R.string.qr_second) + " " + getString(R.string.qr_ago);
         }
-        if (months < 0) { months += 12; years--; }
-        String result = "";
-        if (years > 0) result += years + " " + getString(years == 1? R.string.qr_year : R.string.qr_years) + " ";
-        if (months > 0) result += months + " " + getString(months == 1? R.string.qr_month : R.string.qr_months) + " ";
-        if (days > 0) result += days + " " + getString(days == 1? R.string.qr_day : R.string.qr_days) + " ";
-        if (hours > 0 || result.length() > 0) result += hours + " " + getString(hours == 1? R.string.qr_hour : R.string.qr_hours) + " ";
-        if (minutes > 0 || result.length() > 0) result += minutes + " " + getString(minutes == 1? R.string.qr_minute : R.string.qr_minutes) + " ";
-        result += seconds + " " + getString(seconds == 1? R.string.qr_second : R.string.qr_seconds) + " ";
-        result += getString(R.string.qr_ago);
-        return result;
+
+        // --- 4. Calculate YEARS ---
+        int years = 0;
+        while (true) {
+            java.util.Calendar next = (java.util.Calendar) cursor.clone();
+            next.add(java.util.Calendar.YEAR, 1);
+            if (next.after(now)) break;
+            cursor.add(java.util.Calendar.YEAR, 1);
+            years++;
+        }
+
+        // --- 5. Calculate MONTHS ---
+        int months = 0;
+        while (true) {
+            java.util.Calendar next = (java.util.Calendar) cursor.clone();
+            next.add(java.util.Calendar.MONTH, 1);
+            if (next.after(now)) break;
+            cursor.add(java.util.Calendar.MONTH, 1);
+            months++;
+        }
+
+        // --- 6. Calculate DAYS ---
+        int days = 0;
+        while (true) {
+            java.util.Calendar next = (java.util.Calendar) cursor.clone();
+            next.add(java.util.Calendar.DAY_OF_MONTH, 1);
+            if (next.after(now)) break;
+            cursor.add(java.util.Calendar.DAY_OF_MONTH, 1);
+            days++;
+        }
+
+        // --- 7. Calculate HOURS ---
+        int hours = 0;
+        while (true) {
+            java.util.Calendar next = (java.util.Calendar) cursor.clone();
+            next.add(java.util.Calendar.HOUR_OF_DAY, 1);
+            if (next.after(now)) break;
+            cursor.add(java.util.Calendar.HOUR_OF_DAY, 1);
+            hours++;
+        }
+
+        // --- 8. Calculate MINUTES ---
+        int minutes = 0;
+        while (true) {
+            java.util.Calendar next = (java.util.Calendar) cursor.clone();
+            next.add(java.util.Calendar.MINUTE, 1);
+            if (next.after(now)) break;
+            cursor.add(java.util.Calendar.MINUTE, 1);
+            minutes++;
+        }
+
+        // --- 9. Calculate SECONDS ---
+        long remainingMillis = now.getTimeInMillis() - cursor.getTimeInMillis();
+        int seconds = (int) (remainingMillis / 1000);
+        if (seconds < 0) seconds = 0;
+        if (seconds > 59) seconds = 59;
+
+        // --- 10. Build localized string ---
+        StringBuilder sb = new StringBuilder();
+        if (years > 0) sb.append(years).append(" ").append(getString(years == 1? R.string.qr_year : R.string.qr_years)).append(" ");
+        if (months > 0) sb.append(months).append(" ").append(getString(months == 1? R.string.qr_month : R.string.qr_months)).append(" ");
+        if (days > 0) sb.append(days).append(" ").append(getString(days == 1? R.string.qr_day : R.string.qr_days)).append(" ");
+        if (hours > 0 || sb.length() > 0) sb.append(hours).append(" ").append(getString(hours == 1? R.string.qr_hour : R.string.qr_hours)).append(" ");
+        if (minutes > 0 || sb.length() > 0) sb.append(minutes).append(" ").append(getString(minutes == 1? R.string.qr_minute : R.string.qr_minutes)).append(" ");
+        sb.append(seconds).append(" ").append(getString(seconds == 1? R.string.qr_second : R.string.qr_seconds)).append(" ");
+        sb.append(getString(R.string.qr_ago));
+        return sb.toString();
     }
 
+    /**
+     * Refresh live UI fields that change over time or with chain updates:
+     * - Status (pending/building/confirmed) based on depth
+     * - Confirmation height string
+     * - Age (calls formatAge)
+     * - QR (contains live age and status)
+     */
     private void refreshLiveFields() {
         if (tx == null || tvStatus == null || tvHeight == null) return;
         TransactionConfidence confidence = tx.getConfidence();
@@ -946,6 +1091,10 @@ public class TransactionDetailsActivity extends Activity {
         updateLiveQr();
     }
 
+    /**
+     * Setup expandable cards: header click expands/collapses content, body click copies content.
+     * Uses touch Y to distinguish header vs body click and foreground ripple hotspot.
+     */
     private void setupExpandableCards() {
         final View contentSender = findViewById(R.id.content_sender);
         final View contentTxDetails = findViewById(R.id.content_tx_details);
@@ -1061,6 +1210,10 @@ public class TransactionDetailsActivity extends Activity {
         findViewById(R.id.ic_copy_txid).setOnClickListener(v -> copy(getTv(tvTxid)));
     }
 
+    /**
+     * Setup parallax quick-return header behavior.
+     * Header slides out on scroll down, slides in on scroll up.
+     */
     private void setupParallaxScroll() {
         final View scroll = findViewById(R.id.nested_scroll);
         final View cardHeader = findViewById(R.id.card_header);
