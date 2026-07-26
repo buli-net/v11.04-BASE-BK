@@ -972,7 +972,6 @@ private void updateLiveQr() {
     // Setup accordion behavior like main wallet screen
 // Initial state: only header card is expanded, others collapsed showing only title
 // On click: expand full, change background to expanded color, collapse others
-
 private void setupExpandableCards() {
     final View contentSender = findViewById(R.id.content_sender);
     final View contentTxDetails = findViewById(R.id.content_tx_details);
@@ -992,7 +991,6 @@ private void setupExpandableCards() {
     final int colorBg = getResources().getColor(R.color.tx_card_bg);
     final int colorExpanded = getResources().getColor(R.color.tx_card_expanded);
 
-    // Store last touch Y for each card to distinguish header vs content
     final float[] lastTouchY = new float[4];
 
     View.OnTouchListener hotspotTouch = new View.OnTouchListener() {
@@ -1007,7 +1005,7 @@ private void setupExpandableCards() {
                 else if (v == cardIo) lastTouchY[2] = event.getY();
                 else if (v == cardTxid) lastTouchY[3] = event.getY();
             }
-            return false; // let click still fire
+            return false;
         }
     };
 
@@ -1023,25 +1021,24 @@ private void setupExpandableCards() {
             View content = null;
             View header = null;
             float touchY = 0;
-            int index = -1;
 
-            if (v == cardSender) { content = contentSender; header = headerSender; touchY = lastTouchY[0]; index = 0; }
-            else if (v == cardDetails) { content = contentTxDetails; header = headerDetails; touchY = lastTouchY[1]; index = 1; }
-            else if (v == cardIo) { content = contentIo; header = headerIo; touchY = lastTouchY[2]; index = 2; }
-            else if (v == cardTxid) { content = contentTxid; header = headerTxid; touchY = lastTouchY[3]; index = 3; }
+            if (v == cardSender) { content = contentSender; header = headerSender; touchY = lastTouchY[0]; }
+            else if (v == cardDetails) { content = contentTxDetails; header = headerDetails; touchY = lastTouchY[1]; }
+            else if (v == cardIo) { content = contentIo; header = headerIo; touchY = lastTouchY[2]; }
+            else if (v == cardTxid) { content = contentTxid; header = headerTxid; touchY = lastTouchY[3]; }
 
             if (content == null) return;
 
             boolean isHeaderClick = touchY <= header.getHeight();
 
             if (isHeaderClick) {
-                // Toggle expand/collapse like main wallet
                 boolean shouldExpand = content.getVisibility()!= View.VISIBLE;
 
                 contentSender.setVisibility(View.GONE);
                 contentTxDetails.setVisibility(View.GONE);
                 contentIo.setVisibility(View.GONE);
                 contentTxid.setVisibility(View.GONE);
+
                 cardSender.setCardBackgroundColor(colorBg);
                 cardDetails.setCardBackgroundColor(colorBg);
                 cardIo.setCardBackgroundColor(colorBg);
@@ -1052,11 +1049,21 @@ private void setupExpandableCards() {
                     card.setCardBackgroundColor(colorExpanded);
                 }
             } else {
-                // Click on body = copy only, no collapse
-                if (v == cardSender) copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo));
-                else if (v == cardDetails) copy(getTv(tvStatus) + "\n" + getTv(tvFee) + "\n" + getTv(tvMeta));
-                else if (v == cardIo) copy(getTv(tvFrom) + "\n\n" + getTv(tvTo));
-                else if (v == cardTxid) copy(getTv(tvTxid));
+                if (v == cardSender) {
+                    copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo));
+                } else if (v == cardDetails) {
+                    String full = getString(R.string.tx_details_status) + ": " + getTv(tvStatus) + "\n" +
+                            getString(R.string.tx_details_fee) + ": " + getTv(tvFee) + "\n" +
+                            getString(R.string.tx_details_size_weight) + ": " + getTv(tvMeta) + "\n" +
+                            getString(R.string.tx_details_confirmations) + ": " + getTv(tvHeight) + "\n" +
+                            getString(R.string.tx_details_time) + ": " + getTv(tvTime) + "\n" +
+                            getString(R.string.tx_details_age) + ": " + getTv(tvAge);
+                    copy(full);
+                } else if (v == cardIo) {
+                    copy(getTv(tvFrom) + "\n\n" + getTv(tvTo));
+                } else if (v == cardTxid) {
+                    copy(getTv(tvTxid));
+                }
             }
         }
     };
@@ -1066,18 +1073,39 @@ private void setupExpandableCards() {
     cardIo.setOnClickListener(cardClick);
     cardTxid.setOnClickListener(cardClick);
 
-    // Copy icons keep their own click and block parent
+    // Copy buttons - full content, has circular ripple via XML background
     findViewById(R.id.ic_copy_sender).setOnClickListener(new View.OnClickListener() {
-        @Override public void onClick(View v) { copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo)); }
+        @Override
+        public void onClick(View v) {
+            copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo));
+        }
     });
+
     findViewById(R.id.ic_copy_details).setOnClickListener(new View.OnClickListener() {
-        @Override public void onClick(View v) { copy(getTv(tvStatus) + " | " + getTv(tvFee)); }
+        @Override
+        public void onClick(View v) {
+            String full = getString(R.string.tx_details_status) + ": " + getTv(tvStatus) + "\n" +
+                    getString(R.string.tx_details_fee) + ": " + getTv(tvFee) + "\n" +
+                    getString(R.string.tx_details_size_weight) + ": " + getTv(tvMeta) + "\n" +
+                    getString(R.string.tx_details_confirmations) + ": " + getTv(tvHeight) + "\n" +
+                    getString(R.string.tx_details_time) + ": " + getTv(tvTime) + "\n" +
+                    getString(R.string.tx_details_age) + ": " + getTv(tvAge);
+            copy(full);
+        }
     });
+
     findViewById(R.id.ic_copy_io).setOnClickListener(new View.OnClickListener() {
-        @Override public void onClick(View v) { copy(getTv(tvFrom) + "\n\n" + getTv(tvTo)); }
+        @Override
+        public void onClick(View v) {
+            copy(getTv(tvFrom) + "\n\n" + getTv(tvTo));
+        }
     });
+
     findViewById(R.id.ic_copy_txid).setOnClickListener(new View.OnClickListener() {
-        @Override public void onClick(View v) { copy(getTv(tvTxid)); }
+        @Override
+        public void onClick(View v) {
+            copy(getTv(tvTxid));
+        }
     });
 }
 
