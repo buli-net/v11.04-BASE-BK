@@ -103,7 +103,6 @@
             android:padding="8dp">
 
             <!-- CARD 1: Sender / Receiver -->
-            <!-- Fixed: ripple on CardView itself for full-card effect when clicking header -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_sender"
                 android:layout_width="match_parent"
@@ -121,14 +120,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <!-- Header: no background ripple here, parent CardView handles full ripple -->
+                    <!-- Header: clickable=false to let parent CardView handle ripple from touch point -->
                     <LinearLayout
                         android:id="@+id/header_sender"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:padding="16dp"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false">
 
                         <TextView
                             android:layout_width="0dp"
@@ -137,7 +138,9 @@
                             android:text="@string/tx_details_sender_receiver"
                             android:textStyle="bold"
                             android:textSize="16sp"
-                            android:textColor="@color/tx_text_primary" />
+                            android:textColor="@color/tx_text_primary"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                         <!-- Copy icon has its own clickable to block parent ripple -->
                         <ImageView
@@ -151,7 +154,7 @@
 
                     </LinearLayout>
 
-                    <!-- Collapsible content - transparent to preserve card color -->
+                    <!-- Collapsible content - clickable=false to let parent CardView handle ripple -->
                     <LinearLayout
                         android:id="@+id/content_sender"
                         android:orientation="vertical"
@@ -160,7 +163,9 @@
                         android:paddingBottom="16dp"
                         android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false">
 
                         <TextView
                             android:text="@string/tx_details_from"
@@ -168,7 +173,9 @@
                             android:textSize="14sp"
                             android:textColor="@color/tx_text_secondary"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                         <TextView
                             android:id="@+id/tv_actual_from"
@@ -178,7 +185,9 @@
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                         <View
                             android:layout_width="match_parent"
@@ -193,7 +202,9 @@
                             android:textSize="14sp"
                             android:textColor="@color/tx_text_secondary"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                         <TextView
                             android:id="@+id/tv_actual_to"
@@ -203,7 +214,9 @@
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                     </LinearLayout>
 
@@ -236,7 +249,9 @@
                         android:gravity="center_vertical"
                         android:padding="16dp"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false">
 
                         <TextView
                             android:layout_width="0dp"
@@ -245,7 +260,9 @@
                             android:text="@string/tx_details_transaction_details"
                             android:textStyle="bold"
                             android:textColor="@color/tx_text_primary"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                         <ImageView
                             android:id="@+id/ic_copy_details"
@@ -266,19 +283,25 @@
                         android:paddingTop="0dp"
                         android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false">
 
                         <LinearLayout
                             android:orientation="horizontal"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false">
 
                             <TextView
                                 android:text="@string/tx_details_status"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                             <TextView
                                 android:id="@+id/tv_status"
@@ -286,7 +309,9 @@
                                 android:textStyle="bold"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                         </LinearLayout>
 
@@ -294,14 +319,18 @@
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false">
 
                             <TextView
                                 android:text="@string/tx_details_fee"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                             <TextView
                                 android:id="@+id/tv_fee"
@@ -309,7 +338,9 @@
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                         </LinearLayout>
 
@@ -317,14 +348,18 @@
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false">
 
                             <TextView
                                 android:text="@string/tx_details_size_weight"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                             <TextView
                                 android:id="@+id/tv_meta"
@@ -332,7 +367,9 @@
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                         </LinearLayout>
 
@@ -340,14 +377,18 @@
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false">
 
                             <TextView
                                 android:text="@string/tx_details_confirmations"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                             <TextView
                                 android:id="@+id/tv_height"
@@ -355,7 +396,9 @@
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                         </LinearLayout>
 
@@ -363,14 +406,18 @@
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false">
 
                             <TextView
                                 android:text="@string/tx_details_time"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                             <TextView
                                 android:id="@+id/tv_time"
@@ -378,7 +425,9 @@
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                         </LinearLayout>
 
@@ -386,14 +435,18 @@
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false">
 
                             <TextView
                                 android:text="@string/tx_details_age"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                             <TextView
                                 android:id="@+id/tv_age"
@@ -401,7 +454,9 @@
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
 
                         </LinearLayout>
 
@@ -435,7 +490,9 @@
                         android:gravity="center_vertical"
                         android:padding="16dp"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false">
 
                         <TextView
                             android:layout_width="0dp"
@@ -444,7 +501,9 @@
                             android:text="@string/tx_details_send_receive_details"
                             android:textStyle="bold"
                             android:textSize="16sp"
-                            android:textColor="@color/tx_text_primary" />
+                            android:textColor="@color/tx_text_primary"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                         <ImageView
                             android:id="@+id/ic_copy_io"
@@ -464,7 +523,9 @@
                         android:paddingTop="0dp"
                         android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false">
 
                         <TextView
                             android:text="@string/tx_details_sent_details"
@@ -472,7 +533,9 @@
                             android:textSize="16sp"
                             android:textColor="@color/tx_text_primary"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                         <TextView
                             android:id="@+id/tv_from"
@@ -485,7 +548,9 @@
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="12dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                         <View
                             android:layout_width="match_parent"
@@ -499,7 +564,9 @@
                             android:textColor="@color/tx_text_primary"
                             android:layout_marginTop="12dp"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                         <TextView
                             android:id="@+id/tv_to"
@@ -511,7 +578,9 @@
                             android:breakStrategy="simple"
                             android:layout_marginTop="4dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                     </LinearLayout>
 
@@ -542,7 +611,9 @@
                         android:gravity="center_vertical"
                         android:padding="16dp"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false">
 
                         <TextView
                             android:layout_width="0dp"
@@ -551,7 +622,9 @@
                             android:text="@string/tx_details_transaction_id"
                             android:textStyle="bold"
                             android:textSize="16sp"
-                            android:textColor="@color/tx_text_primary" />
+                            android:textColor="@color/tx_text_primary"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                         <ImageView
                             android:id="@+id/ic_copy_txid"
@@ -571,7 +644,9 @@
                         android:paddingTop="0dp"
                         android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false">
 
                         <TextView
                             android:id="@+id/tv_txid"
@@ -581,7 +656,9 @@
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false" />
 
                     </LinearLayout>
 
