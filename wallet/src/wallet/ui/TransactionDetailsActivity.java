@@ -988,7 +988,48 @@ private void setupExpandableCards() {
     View contentIo = findViewById(R.id.content_io);
     View contentTxid = findViewById(R.id.content_txid);
 
+    View copySender = findViewById(R.id.ic_copy_sender);
+    View copyDetails = findViewById(R.id.ic_copy_details);
+    View copyIo = findViewById(R.id.ic_copy_io);
+    View copyTxid = findViewById(R.id.ic_copy_txid);
+
+    // Copy in card - icon header
+    if (copySender != null) {
+        copySender.setOnClickListener(v -> {
+            String s = getTv(tvActualFrom) + "\n" + getTv(tvActualTo);
+            copy(s);
+            v.setPressed(false);
+        });
+    }
+    if (copyDetails != null) {
+        copyDetails.setOnClickListener(v -> {
+            String s = getString(R.string.tx_details_status) + ": " + getTv(tvStatus) + "\n"
+                    + getString(R.string.tx_details_fee) + ": " + getTv(tvFee) + "\n"
+                    + getString(R.string.tx_details_size_weight) + ": " + getTv(tvMeta) + "\n"
+                    + getString(R.string.tx_details_confirmations) + ": " + getTv(tvHeight) + "\n"
+                    + getString(R.string.tx_details_time) + ": " + getTv(tvTime) + "\n"
+                    + getString(R.string.tx_details_age) + ": " + getTv(tvAge);
+            copy(s);
+            v.setPressed(false);
+        });
+    }
+    if (copyIo != null) {
+        copyIo.setOnClickListener(v -> {
+            copy(getTv(tvFrom) + "\n\n" + getTv(tvTo));
+            v.setPressed(false);
+        });
+    }
+    if (copyTxid != null) {
+        copyTxid.setOnClickListener(v -> {
+            copy(getTv(tvTxid));
+            v.setPressed(false);
+        });
+    }
+
     View.OnClickListener toggle = v -> {
+        // if click icon copy not toggle
+        if (v.getId() == R.id.ic_copy_sender || v.getId() == R.id.ic_copy_details || v.getId() == R.id.ic_copy_io || v.getId() == R.id.ic_copy_txid) return;
+
         boolean isSender = v.getId() == R.id.header_sender;
         boolean isDetails = v.getId() == R.id.header_tx_details;
         boolean isIo = v.getId() == R.id.header_io;
@@ -996,14 +1037,15 @@ private void setupExpandableCards() {
 
         View targetContent = isSender ? contentSender : isDetails ? contentTxDetails : isIo ? contentIo : contentTxid;
         androidx.cardview.widget.CardView targetCard = (androidx.cardview.widget.CardView) (isSender ? cardSender : isDetails ? cardTxDetails : isIo ? cardIo : cardTxid);
+        if (targetContent == null || targetCard == null) return;
 
         boolean willExpand = targetContent.getVisibility() != View.VISIBLE;
 
-        // Collapse all first
         contentSender.setVisibility(View.GONE);
         contentTxDetails.setVisibility(View.GONE);
         contentIo.setVisibility(View.GONE);
         contentTxid.setVisibility(View.GONE);
+
         ((androidx.cardview.widget.CardView)cardSender).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
         ((androidx.cardview.widget.CardView)cardTxDetails).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
         ((androidx.cardview.widget.CardView)cardIo).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
@@ -1014,8 +1056,6 @@ private void setupExpandableCards() {
             targetContent.setAlpha(0f);
             targetContent.animate().alpha(1f).setDuration(180).start();
             targetCard.setCardBackgroundColor(getResources().getColor(R.color.tx_card_expanded));
-            // Change page background slightly like main screen
-            findViewById(android.R.id.content).setBackgroundColor(getResources().getColor(R.color.tx_page_bg));
         }
     };
 
@@ -1023,10 +1063,8 @@ private void setupExpandableCards() {
     headerTxDetails.setOnClickListener(toggle);
     headerIo.setOnClickListener(toggle);
     headerTxid.setOnClickListener(toggle);
-    
-    // Copy full still works on toolbar button
 }
-
+    
     private void setupParallaxScroll() {
         final View scroll = findViewById(R.id.nested_scroll);
         final View cardHeader = findViewById(R.id.card_header);
