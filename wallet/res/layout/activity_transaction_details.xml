@@ -35,7 +35,7 @@
         android:layout_margin="8dp"
         app:cardCornerRadius="0dp"
         app:cardElevation="0dp"
-        app:cardBackgroundColor="@color/bg_action_bar"
+        android:foreground="?android:attr/selectableItemBackground">
         >
         
         <RelativeLayout
