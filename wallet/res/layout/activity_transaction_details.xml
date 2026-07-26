@@ -43,7 +43,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp">
+            android:padding="10dp">
 
             <!-- Small QR - background controlled by XML -->
             <ImageView
