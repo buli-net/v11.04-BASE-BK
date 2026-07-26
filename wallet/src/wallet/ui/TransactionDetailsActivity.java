@@ -972,20 +972,18 @@ private void updateLiveQr() {
     // Setup accordion behavior like main wallet screen
 // Initial state: only header card is expanded, others collapsed showing only title
 // On click: expand full, change background to expanded color, collapse others
-    private void setupExpandableCards() {
-    // Content views
+
+private void setupExpandableCards() {
     final View contentSender = findViewById(R.id.content_sender);
     final View contentTxDetails = findViewById(R.id.content_tx_details);
     final View contentIo = findViewById(R.id.content_io);
     final View contentTxid = findViewById(R.id.content_txid);
 
-    // CardViews for background color and full-card ripple
     final androidx.cardview.widget.CardView cardSender = findViewById(R.id.card_sender);
     final androidx.cardview.widget.CardView cardDetails = findViewById(R.id.card_tx_details);
     final androidx.cardview.widget.CardView cardIo = findViewById(R.id.card_io);
     final androidx.cardview.widget.CardView cardTxid = findViewById(R.id.card_txid);
 
-    // Header views for toggle
     final View headerSender = findViewById(R.id.header_sender);
     final View headerDetails = findViewById(R.id.header_tx_details);
     final View headerIo = findViewById(R.id.header_io);
@@ -994,150 +992,92 @@ private void updateLiveQr() {
     final int colorBg = getResources().getColor(R.color.tx_card_bg);
     final int colorExpanded = getResources().getColor(R.color.tx_card_expanded);
 
-    // Helper: trigger full-card foreground ripple on parent CardView
-    View.OnClickListener triggerFullRipple = new View.OnClickListener() {
+    // Store last touch Y for each card to distinguish header vs content
+    final float[] lastTouchY = new float[4];
+
+    View.OnTouchListener hotspotTouch = new View.OnTouchListener() {
         @Override
-        public void onClick(View v) {
-            View p = (View) v.getParent();
-            while (p != null && !(p instanceof androidx.cardview.widget.CardView)) {
-                if (p.getParent() instanceof View) {
-                    p = (View) p.getParent();
-                } else {
-                    break;
+        public boolean onTouch(View v, android.view.MotionEvent event) {
+            if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+                if (v.getForeground()!= null) {
+                    v.getForeground().setHotspot(event.getX(), event.getY());
                 }
+                if (v == cardSender) lastTouchY[0] = event.getY();
+                else if (v == cardDetails) lastTouchY[1] = event.getY();
+                else if (v == cardIo) lastTouchY[2] = event.getY();
+                else if (v == cardTxid) lastTouchY[3] = event.getY();
             }
-            if (p != null && p.getForeground() != null) {
-                final View parentCard = p;
-                parentCard.getForeground().setHotspot(v.getX() + v.getLeft(), v.getY() + v.getTop());
-                parentCard.getForeground().setState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled});
-                parentCard.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        parentCard.getForeground().setState(new int[]{});
-                    }
-                }, 350);
+            return false; // let click still fire
+        }
+    };
+
+    cardSender.setOnTouchListener(hotspotTouch);
+    cardDetails.setOnTouchListener(hotspotTouch);
+    cardIo.setOnTouchListener(hotspotTouch);
+    cardTxid.setOnTouchListener(hotspotTouch);
+
+    View.OnClickListener cardClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            androidx.cardview.widget.CardView card = (androidx.cardview.widget.CardView) v;
+            View content = null;
+            View header = null;
+            float touchY = 0;
+            int index = -1;
+
+            if (v == cardSender) { content = contentSender; header = headerSender; touchY = lastTouchY[0]; index = 0; }
+            else if (v == cardDetails) { content = contentTxDetails; header = headerDetails; touchY = lastTouchY[1]; index = 1; }
+            else if (v == cardIo) { content = contentIo; header = headerIo; touchY = lastTouchY[2]; index = 2; }
+            else if (v == cardTxid) { content = contentTxid; header = headerTxid; touchY = lastTouchY[3]; index = 3; }
+
+            if (content == null) return;
+
+            boolean isHeaderClick = touchY <= header.getHeight();
+
+            if (isHeaderClick) {
+                // Toggle expand/collapse like main wallet
+                boolean shouldExpand = content.getVisibility()!= View.VISIBLE;
+
+                contentSender.setVisibility(View.GONE);
+                contentTxDetails.setVisibility(View.GONE);
+                contentIo.setVisibility(View.GONE);
+                contentTxid.setVisibility(View.GONE);
+                cardSender.setCardBackgroundColor(colorBg);
+                cardDetails.setCardBackgroundColor(colorBg);
+                cardIo.setCardBackgroundColor(colorBg);
+                cardTxid.setCardBackgroundColor(colorBg);
+
+                if (shouldExpand) {
+                    content.setVisibility(View.VISIBLE);
+                    card.setCardBackgroundColor(colorExpanded);
+                }
+            } else {
+                // Click on body = copy only, no collapse
+                if (v == cardSender) copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo));
+                else if (v == cardDetails) copy(getTv(tvStatus) + "\n" + getTv(tvFee) + "\n" + getTv(tvMeta));
+                else if (v == cardIo) copy(getTv(tvFrom) + "\n\n" + getTv(tvTo));
+                else if (v == cardTxid) copy(getTv(tvTxid));
             }
         }
     };
 
-    // Toggle listener: only header expands/collapses
-    View.OnClickListener toggleListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            View target = null;
-            androidx.cardview.widget.CardView targetCard = null;
+    cardSender.setOnClickListener(cardClick);
+    cardDetails.setOnClickListener(cardClick);
+    cardIo.setOnClickListener(cardClick);
+    cardTxid.setOnClickListener(cardClick);
 
-            int id = v.getId();
-            if (id == R.id.header_sender) {
-                target = contentSender;
-                targetCard = cardSender;
-            } else if (id == R.id.header_tx_details) {
-                target = contentTxDetails;
-                targetCard = cardDetails;
-            } else if (id == R.id.header_io) {
-                target = contentIo;
-                targetCard = cardIo;
-            } else if (id == R.id.header_txid) {
-                target = contentTxid;
-                targetCard = cardTxid;
-            }
-
-            if (target == null) {
-                return;
-            }
-
-            boolean shouldExpand = target.getVisibility() != View.VISIBLE;
-
-            // Collapse all cards
-            contentSender.setVisibility(View.GONE);
-            contentTxDetails.setVisibility(View.GONE);
-            contentIo.setVisibility(View.GONE);
-            contentTxid.setVisibility(View.GONE);
-
-            cardSender.setCardBackgroundColor(colorBg);
-            cardDetails.setCardBackgroundColor(colorBg);
-            cardIo.setCardBackgroundColor(colorBg);
-            cardTxid.setCardBackgroundColor(colorBg);
-
-            // Expand selected if needed
-            if (shouldExpand) {
-                target.setVisibility(View.VISIBLE);
-                targetCard.setCardBackgroundColor(colorExpanded);
-            }
-        }
-    };
-
-    // Header clicks = full ripple + expand/collapse
-    headerSender.setOnClickListener(toggleListener);
-    headerDetails.setOnClickListener(toggleListener);
-    headerIo.setOnClickListener(toggleListener);
-    headerTxid.setOnClickListener(toggleListener);
-
-    // Content clicks = full ripple + copy only, no collapse
-    contentSender.setClickable(true);
-    contentSender.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            triggerFullRipple.onClick(v);
-            copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo));
-        }
-    });
-
-    contentTxDetails.setClickable(true);
-    contentTxDetails.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            triggerFullRipple.onClick(v);
-            String text = getTv(tvStatus) + "\n" + getTv(tvFee) + "\n" + getTv(tvMeta) + "\n" + getTv(tvHeight) + "\n" + getTv(tvTime) + "\n" + getTv(tvAge);
-            copy(text);
-        }
-    });
-
-    contentIo.setClickable(true);
-    contentIo.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            triggerFullRipple.onClick(v);
-            copy(getTv(tvFrom) + "\n\n" + getTv(tvTo));
-        }
-    });
-
-    contentTxid.setClickable(true);
-    contentTxid.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            triggerFullRipple.onClick(v);
-            copy(getTv(tvTxid));
-        }
-    });
-
-    // Copy icons
+    // Copy icons keep their own click and block parent
     findViewById(R.id.ic_copy_sender).setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo));
-        }
+        @Override public void onClick(View v) { copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo)); }
     });
-
     findViewById(R.id.ic_copy_details).setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            copy(getTv(tvStatus) + " | " + getTv(tvFee) + " | " + getTv(tvMeta));
-        }
+        @Override public void onClick(View v) { copy(getTv(tvStatus) + " | " + getTv(tvFee)); }
     });
-
     findViewById(R.id.ic_copy_io).setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            copy(getTv(tvFrom) + "\n\n" + getTv(tvTo));
-        }
+        @Override public void onClick(View v) { copy(getTv(tvFrom) + "\n\n" + getTv(tvTo)); }
     });
-
     findViewById(R.id.ic_copy_txid).setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            copy(getTv(tvTxid));
-        }
+        @Override public void onClick(View v) { copy(getTv(tvTxid)); }
     });
 }
 
