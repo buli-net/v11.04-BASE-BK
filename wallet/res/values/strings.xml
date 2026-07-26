@@ -528,6 +528,7 @@
 <string name="tx_details_confirmations">Confirmations</string>
 <string name="tx_details_time">Time</string>
 <string name="tx_details_age">Age</string>
+<string name="tx_details_send_receive_details">Send / Receive Details</string>
 <string name="tx_details_sent_details">Sent Details</string>
 <string name="tx_details_received_details">Received Details</string>
 <string name="tx_details_transaction_id">Transaction ID</string>
