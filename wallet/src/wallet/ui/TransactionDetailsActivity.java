@@ -973,69 +973,36 @@ private void updateLiveQr() {
 // Initial state: only header card is expanded, others collapsed showing only title
 // On click: expand full, change background to expanded color, collapse others
 private void setupExpandableCards() {
-    View cardSender = findViewById(R.id.card_sender);
-    View cardTxDetails = findViewById(R.id.card_tx_details);
-    View cardIo = findViewById(R.id.card_io);
-    View cardTxid = findViewById(R.id.card_txid);
-
-    View headerSender = findViewById(R.id.header_sender);
-    View headerTxDetails = findViewById(R.id.header_tx_details);
-    View headerIo = findViewById(R.id.header_io);
-    View headerTxid = findViewById(R.id.header_txid);
-
-    View contentSender = findViewById(R.id.content_sender);
-    View contentTxDetails = findViewById(R.id.content_tx_details);
-    View contentIo = findViewById(R.id.content_io);
-    View contentTxid = findViewById(R.id.content_txid);
-
-    ViewGroup parent = findViewById(R.id.nested_scroll);
-    ViewGroup container = (ViewGroup) parent.getChildAt(0); // LinearLayout chứa các card
-
+    ViewGroup container = (ViewGroup) findViewById(R.id.nested_scroll).getChildAt(0);
+    
     View.OnClickListener toggle = v -> {
-        boolean isSender = v.getId() == R.id.header_sender;
-        boolean isDetails = v.getId() == R.id.header_tx_details;
-        boolean isIo = v.getId() == R.id.header_io;
-        boolean isTxid = v.getId() == R.id.header_txid;
+        View target = null;
+        if(v.getId()==R.id.header_sender) target = findViewById(R.id.content_sender);
+        else if(v.getId()==R.id.header_tx_details) target = findViewById(R.id.content_tx_details);
+        else if(v.getId()==R.id.header_io) target = findViewById(R.id.content_io);
+        else if(v.getId()==R.id.header_txid) target = findViewById(R.id.content_txid);
+        if(target==null) return;
 
-        View targetContent = isSender ? contentSender : isDetails ? contentTxDetails : isIo ? contentIo : contentTxid;
-        androidx.cardview.widget.CardView targetCard = (androidx.cardview.widget.CardView) (isSender ? cardSender : isDetails ? cardTxDetails : isIo ? cardIo : cardTxid);
-        if (targetContent == null || targetCard == null) return;
+        boolean expand = target.getVisibility()!=View.VISIBLE;
 
-        boolean willExpand = targetContent.getVisibility() != View.VISIBLE;
+        // auto animate layout changes - không cần lib transition
+        android.animation.LayoutTransition lt = new android.animation.LayoutTransition();
+        lt.enableTransitionType(android.animation.LayoutTransition.CHANGING);
+        lt.setDuration(200);
+        container.setLayoutTransition(lt);
 
-        // Hiệu ứng y như video wallet - mượt, đẩy các card khác
-        android.transition.AutoTransition trans = new android.transition.AutoTransition();
-        trans.setDuration(220);
-        trans.setInterpolator(new android.view.animation.DecelerateInterpolator());
-        android.transition.TransitionManager.beginDelayedTransition(container, trans);
+        findViewById(R.id.content_sender).setVisibility(View.GONE);
+        findViewById(R.id.content_tx_details).setVisibility(View.GONE);
+        findViewById(R.id.content_io).setVisibility(View.GONE);
+        findViewById(R.id.content_txid).setVisibility(View.GONE);
 
-        // Collapse all
-        contentSender.setVisibility(View.GONE);
-        contentTxDetails.setVisibility(View.GONE);
-        contentIo.setVisibility(View.GONE);
-        contentTxid.setVisibility(View.GONE);
-
-        ((androidx.cardview.widget.CardView)cardSender).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
-        ((androidx.cardview.widget.CardView)cardTxDetails).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
-        ((androidx.cardview.widget.CardView)cardIo).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
-        ((androidx.cardview.widget.CardView)cardTxid).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
-
-        if (willExpand) {
-            targetContent.setVisibility(View.VISIBLE);
-            targetCard.setCardBackgroundColor(getResources().getColor(R.color.tx_card_expanded));
-        }
+        if(expand) target.setVisibility(View.VISIBLE);
     };
-
-    headerSender.setOnClickListener(toggle);
-    headerTxDetails.setOnClickListener(toggle);
-    headerIo.setOnClickListener(toggle);
-    headerTxid.setOnClickListener(toggle);
-
-    // Giữ nguyên copy riêng
-    findViewById(R.id.ic_copy_sender).setOnClickListener(v -> copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo)));
-    findViewById(R.id.ic_copy_details).setOnClickListener(v -> copy(getTv(tvStatus) + " | " + getTv(tvFee) + " | " + getTv(tvMeta) + " | " + getTv(tvHeight) + " | " + getTv(tvTime) + " | " + getTv(tvAge)));
-    findViewById(R.id.ic_copy_io).setOnClickListener(v -> copy(getTv(tvFrom) + "\n\n" + getTv(tvTo)));
-    findViewById(R.id.ic_copy_txid).setOnClickListener(v -> copy(getTv(tvTxid)));
+    
+    findViewById(R.id.header_sender).setOnClickListener(toggle);
+    findViewById(R.id.header_tx_details).setOnClickListener(toggle);
+    findViewById(R.id.header_io).setOnClickListener(toggle);
+    findViewById(R.id.header_txid).setOnClickListener(toggle);
 }
     
     private void setupParallaxScroll() {
