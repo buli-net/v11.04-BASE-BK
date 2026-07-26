@@ -973,54 +973,63 @@ private void updateLiveQr() {
 // Initial state: only header card is expanded, others collapsed showing only title
 // On click: expand full, change background to expanded color, collapse others
 private void setupExpandableCards() {
-    ViewGroup container = (ViewGroup) ((ViewGroup) findViewById(R.id.nested_scroll)).getChildAt(0);
+    View scroll = findViewById(R.id.nested_scroll);
+    if (!(scroll instanceof ViewGroup)) return;
+    final ViewGroup container = (ViewGroup) ((ViewGroup) scroll).getChildAt(0);
     
+    final View contentSender = findViewById(R.id.content_sender);
+    final View contentDetails = findViewById(R.id.content_tx_details);
+    final View contentIo = findViewById(R.id.content_io);
+    final View contentTxid = findViewById(R.id.content_txid);
+
+    final androidx.cardview.widget.CardView cardSender = findViewById(R.id.card_sender);
+    final androidx.cardview.widget.CardView cardDetails = findViewById(R.id.card_tx_details);
+    final androidx.cardview.widget.CardView cardIo = findViewById(R.id.card_io);
+    final androidx.cardview.widget.CardView cardTxid = findViewById(R.id.card_txid);
+
+    final int colorBg = getResources().getColor(R.color.tx_card_bg);
+    final int colorExpanded = getResources().getColor(R.color.tx_card_expanded);
+
     View.OnClickListener toggle = v -> {
         View target = null;
         androidx.cardview.widget.CardView targetCard = null;
         
-        if(v.getId()==R.id.header_sender) {
-            target = findViewById(R.id.content_sender);
-            targetCard = findViewById(R.id.card_sender);
-        } else if(v.getId()==R.id.header_tx_details) {
-            target = findViewById(R.id.content_tx_details);
-            targetCard = findViewById(R.id.card_tx_details);
-        } else if(v.getId()==R.id.header_io) {
-            target = findViewById(R.id.content_io);
-            targetCard = findViewById(R.id.card_io);
-        } else if(v.getId()==R.id.header_txid) {
-            target = findViewById(R.id.content_txid);
-            targetCard = findViewById(R.id.card_txid);
-        }
+        if(v.getId()==R.id.header_sender) { target = contentSender; targetCard = cardSender; }
+        else if(v.getId()==R.id.header_tx_details) { target = contentDetails; targetCard = cardDetails; }
+        else if(v.getId()==R.id.header_io) { target = contentIo; targetCard = cardIo; }
+        else if(v.getId()==R.id.header_txid) { target = contentTxid; targetCard = cardTxid; }
         if(target==null) return;
 
         boolean expand = target.getVisibility()!=View.VISIBLE;
 
-        android.animation.LayoutTransition lt = new android.animation.LayoutTransition();
-        lt.enableTransitionType(android.animation.LayoutTransition.CHANGING);
-        lt.setDuration(200);
-        container.setLayoutTransition(lt);
-
-        findViewById(R.id.content_sender).setVisibility(View.GONE);
-        findViewById(R.id.content_tx_details).setVisibility(View.GONE);
-        findViewById(R.id.content_io).setVisibility(View.GONE);
-        findViewById(R.id.content_txid).setVisibility(View.GONE);
-
-        ((androidx.cardview.widget.CardView)findViewById(R.id.card_sender)).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
-        ((androidx.cardview.widget.CardView)findViewById(R.id.card_tx_details)).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
-        ((androidx.cardview.widget.CardView)findViewById(R.id.card_io)).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
-        ((androidx.cardview.widget.CardView)findViewById(R.id.card_txid)).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
+        contentSender.setVisibility(View.GONE);
+        contentDetails.setVisibility(View.GONE);
+        contentIo.setVisibility(View.GONE);
+        contentTxid.setVisibility(View.GONE);
+        
+        cardSender.setCardBackgroundColor(colorBg);
+        cardDetails.setCardBackgroundColor(colorBg);
+        cardIo.setCardBackgroundColor(colorBg);
+        cardTxid.setCardBackgroundColor(colorBg);
 
         if(expand) {
             target.setVisibility(View.VISIBLE);
-            targetCard.setCardBackgroundColor(getResources().getColor(R.color.tx_card_expanded));
+            targetCard.setCardBackgroundColor(colorExpanded);
         }
     };
     
+    // Header click
     findViewById(R.id.header_sender).setOnClickListener(toggle);
     findViewById(R.id.header_tx_details).setOnClickListener(toggle);
     findViewById(R.id.header_io).setOnClickListener(toggle);
     findViewById(R.id.header_txid).setOnClickListener(toggle);
+
+    findViewById(R.id.ic_copy_sender).setOnClickListener(v -> copy(getTv(tvFrom) + "\n" + getTv(tvTo)));
+    findViewById(R.id.ic_copy_details).setOnClickListener(v -> copy(
+        getTv(tvStatus) + " | " + getTv(tvFee) + " | " + getTv(tvMeta)
+    ));
+    findViewById(R.id.ic_copy_io).setOnClickListener(v -> copy(getTv(tvFrom) + "\n\n" + getTv(tvTo)));
+    findViewById(R.id.ic_copy_txid).setOnClickListener(v -> copy(getTv(tvTxid)));
 }
     
     private void setupParallaxScroll() {
