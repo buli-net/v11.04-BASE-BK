@@ -995,25 +995,25 @@ private void updateLiveQr() {
     final int colorExpanded = getResources().getColor(R.color.tx_card_expanded);
 
     // Helper: trigger full-card foreground ripple on parent CardView
-    // Used when clicking content area so ripple still spreads full card
     View.OnClickListener triggerFullRipple = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            View parent = (View) v.getParent();
-            while (parent != null && !(parent instanceof androidx.cardview.widget.CardView)) {
-                if (parent.getParent() instanceof View) {
-                    parent = (View) parent.getParent();
+            View p = (View) v.getParent();
+            while (p != null && !(p instanceof androidx.cardview.widget.CardView)) {
+                if (p.getParent() instanceof View) {
+                    p = (View) p.getParent();
                 } else {
                     break;
                 }
             }
-            if (parent != null && parent.getForeground() != null) {
-                parent.getForeground().setHotspot(v.getX() + v.getLeft(), v.getY() + v.getTop());
-                parent.getForeground().setState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled});
-                parent.postDelayed(new Runnable() {
+            if (p != null && p.getForeground() != null) {
+                final View parentCard = p;
+                parentCard.getForeground().setHotspot(v.getX() + v.getLeft(), v.getY() + v.getTop());
+                parentCard.getForeground().setState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled});
+                parentCard.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        parent.getForeground().setState(new int[]{});
+                        parentCard.getForeground().setState(new int[]{});
                     }
                 }, 350);
             }
@@ -1067,13 +1067,13 @@ private void updateLiveQr() {
         }
     };
 
-    // Header clicks = full ripple (CardView foreground) + expand/collapse
+    // Header clicks = full ripple + expand/collapse
     headerSender.setOnClickListener(toggleListener);
     headerDetails.setOnClickListener(toggleListener);
     headerIo.setOnClickListener(toggleListener);
     headerTxid.setOnClickListener(toggleListener);
 
-    // Content clicks = full ripple (manual trigger) + copy only, no collapse
+    // Content clicks = full ripple + copy only, no collapse
     contentSender.setClickable(true);
     contentSender.setOnClickListener(new View.OnClickListener() {
         @Override
@@ -1111,7 +1111,7 @@ private void updateLiveQr() {
         }
     });
 
-    // Copy icons block parent ripple
+    // Copy icons
     findViewById(R.id.ic_copy_sender).setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -1140,7 +1140,7 @@ private void updateLiveQr() {
         }
     });
 }
-    
+
     private void setupParallaxScroll() {
         final View scroll = findViewById(R.id.nested_scroll);
         final View cardHeader = findViewById(R.id.card_header);
