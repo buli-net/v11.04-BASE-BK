@@ -25,12 +25,7 @@
     android:layout_height="match_parent"
     android:background="@color/tx_page_bg">
 
-    <!--
-        Header card - always expanded
-        - Contains direction (Received/Sent), amount and small QR
-        - Small QR uses transparent bitmap + XML white background for size control
-        - Big QR in dialog uses white bitmap for dark mode visibility and saving
-    -->
+    <!-- Header card - always expanded, contains direction, amount and QR -->
     <androidx.cardview.widget.CardView
         android:id="@+id/card_header"
         android:layout_width="match_parent"
@@ -108,6 +103,7 @@
             android:padding="8dp">
 
             <!-- CARD 1: Sender / Receiver -->
+            <!-- Fixed: ripple on CardView itself for full-card effect when clicking header -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_sender"
                 android:layout_width="match_parent"
@@ -115,6 +111,9 @@
                 app:cardCornerRadius="2dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/tx_card_bg"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:layout_marginBottom="8dp">
 
                 <LinearLayout
@@ -122,15 +121,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <!-- Header: click to expand/collapse, icon to copy this card only -->
+                    <!-- Header: no background ripple here, parent CardView handles full ripple -->
                     <LinearLayout
                         android:id="@+id/header_sender"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:padding="16dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -143,6 +139,7 @@
                             android:textSize="16sp"
                             android:textColor="@color/tx_text_primary" />
 
+                        <!-- Copy icon has its own clickable to block parent ripple -->
                         <ImageView
                             android:id="@+id/ic_copy_sender"
                             android:layout_width="22dp"
@@ -154,7 +151,7 @@
 
                     </LinearLayout>
 
-                    <!-- Collapsible content -->
+                    <!-- Collapsible content - transparent to preserve card color -->
                     <LinearLayout
                         android:id="@+id/content_sender"
                         android:orientation="vertical"
@@ -176,7 +173,7 @@
                         <TextView
                             android:id="@+id/tv_actual_from"
                             android:textColor="@color/tx_text_primary"
-                            android:textIsSelectable="true"
+                            android:textIsSelectable="false"
                             android:fontFamily="monospace"
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
@@ -201,7 +198,7 @@
                         <TextView
                             android:id="@+id/tv_actual_to"
                             android:textColor="@color/tx_text_primary"
-                            android:textIsSelectable="true"
+                            android:textIsSelectable="false"
                             android:fontFamily="monospace"
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
@@ -222,6 +219,9 @@
                 app:cardCornerRadius="2dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/tx_card_bg"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:layout_marginBottom="8dp">
 
                 <LinearLayout
@@ -229,14 +229,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <!-- Header: parent CardView handles ripple -->
                     <LinearLayout
                         android:id="@+id/header_tx_details"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:padding="16dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -260,6 +258,7 @@
 
                     </LinearLayout>
 
+                    <!-- Collapsible content -->
                     <LinearLayout
                         android:id="@+id/content_tx_details"
                         android:orientation="vertical"
@@ -420,6 +419,9 @@
                 app:cardCornerRadius="2dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/tx_card_bg"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:layout_marginBottom="8dp">
 
                 <LinearLayout
@@ -432,9 +434,6 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:padding="16dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -478,7 +477,7 @@
                         <TextView
                             android:id="@+id/tv_from"
                             android:textColor="@color/tx_text_secondary"
-                            android:textIsSelectable="true"
+                            android:textIsSelectable="false"
                             android:fontFamily="monospace"
                             android:textSize="13sp"
                             android:lineSpacingExtra="2dp"
@@ -505,7 +504,7 @@
                         <TextView
                             android:id="@+id/tv_to"
                             android:textColor="@color/tx_text_secondary"
-                            android:textIsSelectable="true"
+                            android:textIsSelectable="false"
                             android:fontFamily="monospace"
                             android:textSize="13sp"
                             android:lineSpacingExtra="2dp"
@@ -527,7 +526,10 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="2dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/tx_card_bg">
+                app:cardBackgroundColor="@color/tx_card_bg"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -539,9 +541,6 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
                         android:padding="16dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -577,7 +576,7 @@
                         <TextView
                             android:id="@+id/tv_txid"
                             android:textColor="@color/tx_text_secondary"
-                            android:textIsSelectable="true"
+                            android:textIsSelectable="false"
                             android:fontFamily="monospace"
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
