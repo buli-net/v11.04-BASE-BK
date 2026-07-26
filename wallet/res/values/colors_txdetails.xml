@@ -10,9 +10,6 @@
     <color name="tx_status_pending">#e68a00</color>
     <color name="tx_status_building">#1976d2</color>
 
-    <color name="tx_page_bg">#F1F3EE</color>
-    <color name="tx_card_bg">#FFFFFF</color>
     <color name="tx_card_expanded">#E8EBD9</color>
-    <color name="tx_text_primary">#1A2118</color>
-    <color name="tx_text_secondary">#5A6655</color>
+  
 </resources>
