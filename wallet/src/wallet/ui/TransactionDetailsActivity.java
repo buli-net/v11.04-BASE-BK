@@ -278,6 +278,7 @@ public class TransactionDetailsActivity extends Activity {
         setupQr();
         updateLiveQr();
         setupParallaxScroll();
+        setupExpandableCards();
     }
 
     private void renderInputsAndOutputs() {
@@ -951,6 +952,64 @@ public class TransactionDetailsActivity extends Activity {
         }
         updateLiveQr();
     }
+
+    // Setup accordion behavior like main wallet screen
+// Initial state: only header card is expanded, others collapsed showing only title
+// On click: expand full, change background to expanded color, collapse others
+private void setupExpandableCards() {
+    View cardSender = findViewById(R.id.card_sender);
+    View cardTxDetails = findViewById(R.id.card_tx_details);
+    View cardIo = findViewById(R.id.card_io);
+    View cardTxid = findViewById(R.id.card_txid);
+
+    View headerSender = findViewById(R.id.header_sender);
+    View headerTxDetails = findViewById(R.id.header_tx_details);
+    View headerIo = findViewById(R.id.header_io);
+    View headerTxid = findViewById(R.id.header_txid);
+
+    View contentSender = findViewById(R.id.content_sender);
+    View contentTxDetails = findViewById(R.id.content_tx_details);
+    View contentIo = findViewById(R.id.content_io);
+    View contentTxid = findViewById(R.id.content_txid);
+
+    View.OnClickListener toggle = v -> {
+        boolean isSender = v.getId() == R.id.header_sender;
+        boolean isDetails = v.getId() == R.id.header_tx_details;
+        boolean isIo = v.getId() == R.id.header_io;
+        boolean isTxid = v.getId() == R.id.header_txid;
+
+        View targetContent = isSender ? contentSender : isDetails ? contentTxDetails : isIo ? contentIo : contentTxid;
+        androidx.cardview.widget.CardView targetCard = (androidx.cardview.widget.CardView) (isSender ? cardSender : isDetails ? cardTxDetails : isIo ? cardIo : cardTxid);
+
+        boolean willExpand = targetContent.getVisibility() != View.VISIBLE;
+
+        // Collapse all first
+        contentSender.setVisibility(View.GONE);
+        contentTxDetails.setVisibility(View.GONE);
+        contentIo.setVisibility(View.GONE);
+        contentTxid.setVisibility(View.GONE);
+        ((androidx.cardview.widget.CardView)cardSender).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
+        ((androidx.cardview.widget.CardView)cardTxDetails).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
+        ((androidx.cardview.widget.CardView)cardIo).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
+        ((androidx.cardview.widget.CardView)cardTxid).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
+
+        if (willExpand) {
+            targetContent.setVisibility(View.VISIBLE);
+            targetContent.setAlpha(0f);
+            targetContent.animate().alpha(1f).setDuration(180).start();
+            targetCard.setCardBackgroundColor(getResources().getColor(R.color.tx_card_expanded));
+            // Change page background slightly like main screen
+            findViewById(android.R.id.content).setBackgroundColor(getResources().getColor(R.color.tx_page_bg));
+        }
+    };
+
+    headerSender.setOnClickListener(toggle);
+    headerTxDetails.setOnClickListener(toggle);
+    headerIo.setOnClickListener(toggle);
+    headerTxid.setOnClickListener(toggle);
+    
+    // Copy full still works on toolbar button
+}
 
     private void setupParallaxScroll() {
         final View scroll = findViewById(R.id.nested_scroll);
