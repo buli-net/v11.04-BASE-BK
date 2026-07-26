@@ -150,7 +150,7 @@
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:contentDescription="@string/tx_details_copy" />
+                            android:contentDescription="@string/tx_details_copied" />
 
                     </LinearLayout>
 
@@ -256,7 +256,7 @@
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:contentDescription="@string/tx_details_copy" />
+                            android:contentDescription="@string/tx_details_copied" />
 
                     </LinearLayout>
 
@@ -454,7 +454,7 @@
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:contentDescription="@string/tx_details_copy" />
+                            android:contentDescription="@string/tx_details_copied" />
 
                     </LinearLayout>
 
@@ -561,7 +561,7 @@
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:contentDescription="@string/tx_details_copy" />
+                            android:contentDescription="@string/tx_details_copied" />
 
                     </LinearLayout>
 
