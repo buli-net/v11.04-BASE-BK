@@ -988,48 +988,10 @@ private void setupExpandableCards() {
     View contentIo = findViewById(R.id.content_io);
     View contentTxid = findViewById(R.id.content_txid);
 
-    View copySender = findViewById(R.id.ic_copy_sender);
-    View copyDetails = findViewById(R.id.ic_copy_details);
-    View copyIo = findViewById(R.id.ic_copy_io);
-    View copyTxid = findViewById(R.id.ic_copy_txid);
-
-    // Copy in card - icon header
-    if (copySender != null) {
-        copySender.setOnClickListener(v -> {
-            String s = getTv(tvActualFrom) + "\n" + getTv(tvActualTo);
-            copy(s);
-            v.setPressed(false);
-        });
-    }
-    if (copyDetails != null) {
-        copyDetails.setOnClickListener(v -> {
-            String s = getString(R.string.tx_details_status) + ": " + getTv(tvStatus) + "\n"
-                    + getString(R.string.tx_details_fee) + ": " + getTv(tvFee) + "\n"
-                    + getString(R.string.tx_details_size_weight) + ": " + getTv(tvMeta) + "\n"
-                    + getString(R.string.tx_details_confirmations) + ": " + getTv(tvHeight) + "\n"
-                    + getString(R.string.tx_details_time) + ": " + getTv(tvTime) + "\n"
-                    + getString(R.string.tx_details_age) + ": " + getTv(tvAge);
-            copy(s);
-            v.setPressed(false);
-        });
-    }
-    if (copyIo != null) {
-        copyIo.setOnClickListener(v -> {
-            copy(getTv(tvFrom) + "\n\n" + getTv(tvTo));
-            v.setPressed(false);
-        });
-    }
-    if (copyTxid != null) {
-        copyTxid.setOnClickListener(v -> {
-            copy(getTv(tvTxid));
-            v.setPressed(false);
-        });
-    }
+    ViewGroup parent = findViewById(R.id.nested_scroll);
+    ViewGroup container = (ViewGroup) parent.getChildAt(0); // LinearLayout chứa các card
 
     View.OnClickListener toggle = v -> {
-        // if click icon copy not toggle
-        if (v.getId() == R.id.ic_copy_sender || v.getId() == R.id.ic_copy_details || v.getId() == R.id.ic_copy_io || v.getId() == R.id.ic_copy_txid) return;
-
         boolean isSender = v.getId() == R.id.header_sender;
         boolean isDetails = v.getId() == R.id.header_tx_details;
         boolean isIo = v.getId() == R.id.header_io;
@@ -1041,6 +1003,13 @@ private void setupExpandableCards() {
 
         boolean willExpand = targetContent.getVisibility() != View.VISIBLE;
 
+        // Hiệu ứng y như video wallet - mượt, đẩy các card khác
+        android.transition.AutoTransition trans = new android.transition.AutoTransition();
+        trans.setDuration(220);
+        trans.setInterpolator(new android.view.animation.DecelerateInterpolator());
+        android.transition.TransitionManager.beginDelayedTransition(container, trans);
+
+        // Collapse all
         contentSender.setVisibility(View.GONE);
         contentTxDetails.setVisibility(View.GONE);
         contentIo.setVisibility(View.GONE);
@@ -1053,8 +1022,6 @@ private void setupExpandableCards() {
 
         if (willExpand) {
             targetContent.setVisibility(View.VISIBLE);
-            targetContent.setAlpha(0f);
-            targetContent.animate().alpha(1f).setDuration(180).start();
             targetCard.setCardBackgroundColor(getResources().getColor(R.color.tx_card_expanded));
         }
     };
@@ -1063,6 +1030,12 @@ private void setupExpandableCards() {
     headerTxDetails.setOnClickListener(toggle);
     headerIo.setOnClickListener(toggle);
     headerTxid.setOnClickListener(toggle);
+
+    // Giữ nguyên copy riêng
+    findViewById(R.id.ic_copy_sender).setOnClickListener(v -> copy(getTv(tvActualFrom) + "\n" + getTv(tvActualTo)));
+    findViewById(R.id.ic_copy_details).setOnClickListener(v -> copy(getTv(tvStatus) + " | " + getTv(tvFee) + " | " + getTv(tvMeta) + " | " + getTv(tvHeight) + " | " + getTv(tvTime) + " | " + getTv(tvAge)));
+    findViewById(R.id.ic_copy_io).setOnClickListener(v -> copy(getTv(tvFrom) + "\n\n" + getTv(tvTo)));
+    findViewById(R.id.ic_copy_txid).setOnClickListener(v -> copy(getTv(tvTxid)));
 }
     
     private void setupParallaxScroll() {
