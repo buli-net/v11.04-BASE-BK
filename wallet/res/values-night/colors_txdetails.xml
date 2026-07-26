@@ -9,4 +9,6 @@
     <color name="tx_status_ok">#5cd68a</color>
     <color name="tx_status_pending">#ffb84d</color>
     <color name="tx_status_building">#5aa9ff</color>
+    
+    <color name="tx_card_expanded">#2D3629</color>
 </resources>
