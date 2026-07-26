@@ -8,7 +8,7 @@
     android:background="@color/tx_page_bg"
     >
 
-    <!-- Header card - same background as main balance card, supports light/dark theme via @color/action_bar -->
+    <!-- Header card - always expanded, contains QR, same style as main balance card -->
     <androidx.cardview.widget.CardView
         android:id="@+id/card_header"
         android:layout_width="match_parent"
@@ -70,7 +70,7 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!-- Scrollable content with shared system scrollbar - auto theme -->
+    <!-- Scrollable content with shared system scrollbar -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nested_scroll"
         android:layout_width="match_parent"
@@ -90,6 +90,7 @@
             android:padding="8dp"
             >
 
+            <!-- CARD 1: Sender / Receiver - collapsed by default, only header visible -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_sender"
                 android:layout_width="match_parent"
@@ -101,74 +102,91 @@
                 >
 
                 <LinearLayout
-                    android:padding="16dp"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     >
 
                     <TextView
+                        android:id="@+id/header_sender"
                         android:text="@string/tx_details_sender_receiver"
                         android:textStyle="bold"
                         android:textSize="16sp"
                         android:textColor="@color/tx_text_primary"
-                        android:layout_marginBottom="12dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <TextView
-                        android:text="@string/tx_details_from"
-                        android:textStyle="bold"
-                        android:textSize="14sp"
-                        android:textColor="@color/tx_text_secondary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <TextView
-                        android:id="@+id/tv_actual_from"
-                        android:textColor="@color/tx_text_primary"
-                        android:textIsSelectable="true"
-                        android:fontFamily="monospace"
-                        android:textSize="13sp"
-                        android:layout_marginTop="4dp"
+                        android:padding="16dp"
+                        android:drawableEnd="@drawable/ic_expand_more"
+                        android:drawableTint="@color/tx_text_secondary"
+                        android:gravity="center_vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp"
-                        android:background="#33000000"
-                        />
-
-                    <TextView
-                        android:text="@string/tx_details_to"
-                        android:textStyle="bold"
-                        android:textSize="14sp"
-                        android:textColor="@color/tx_text_secondary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <TextView
-                        android:id="@+id/tv_actual_to"
-                        android:textColor="@color/tx_text_primary"
-                        android:textIsSelectable="true"
-                        android:fontFamily="monospace"
-                        android:textSize="13sp"
-                        android:layout_marginTop="4dp"
+                    <LinearLayout
+                        android:id="@+id/content_sender"
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="16dp"
+                        android:visibility="gone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        />
+                        >
+
+                        <TextView
+                            android:text="@string/tx_details_from"
+                            android:textStyle="bold"
+                            android:textSize="14sp"
+                            android:textColor="@color/tx_text_secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <TextView
+                            android:id="@+id/tv_actual_from"
+                            android:textColor="@color/tx_text_primary"
+                            android:textIsSelectable="true"
+                            android:fontFamily="monospace"
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="#33000000"
+                            />
+
+                        <TextView
+                            android:text="@string/tx_details_to"
+                            android:textStyle="bold"
+                            android:textSize="14sp"
+                            android:textColor="@color/tx_text_secondary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <TextView
+                            android:id="@+id/tv_actual_to"
+                            android:textColor="@color/tx_text_primary"
+                            android:textIsSelectable="true"
+                            android:fontFamily="monospace"
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
+            <!-- CARD 2: Transaction details - collapsed by default -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_tx_details"
                 android:layout_width="match_parent"
@@ -180,174 +198,188 @@
                 >
 
                 <LinearLayout
-                    android:padding="16dp"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     >
 
                     <TextView
+                        android:id="@+id/header_tx_details"
                         android:text="@string/tx_details_transaction_details"
                         android:textStyle="bold"
                         android:textColor="@color/tx_text_primary"
                         android:textSize="16sp"
-                        android:layout_marginBottom="12dp"
-                        android:layout_width="wrap_content"
+                        android:padding="16dp"
+                        android:drawableEnd="@drawable/ic_expand_more"
+                        android:drawableTint="@color/tx_text_secondary"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         />
 
                     <LinearLayout
-                        android:orientation="horizontal"
+                        android:id="@+id/content_tx_details"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:paddingTop="0dp"
+                        android:visibility="gone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         >
 
-                        <TextView
-                            android:text="@string/tx_details_status"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="120dp"
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            />
+                            >
 
-                        <TextView
-                            android:id="@+id/tv_status"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
+                            <TextView
+                                android:text="@string/tx_details_status"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="120dp"
+                                android:layout_height="wrap_content"
+                                />
+
+                            <TextView
+                                android:id="@+id/tv_status"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            />
+                            >
 
-                    </LinearLayout>
+                            <TextView
+                                android:text="@string/tx_details_fee"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="120dp"
+                                android:layout_height="wrap_content"
+                                />
 
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
+                            <TextView
+                                android:id="@+id/tv_fee"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                />
 
-                        <TextView
-                            android:text="@string/tx_details_fee"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="120dp"
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            />
+                            >
 
-                        <TextView
-                            android:id="@+id/tv_fee"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
+                            <TextView
+                                android:text="@string/tx_details_size_weight"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="120dp"
+                                android:layout_height="wrap_content"
+                                />
+
+                            <TextView
+                                android:id="@+id/tv_meta"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            />
+                            >
 
-                    </LinearLayout>
+                            <TextView
+                                android:text="@string/tx_details_confirmations"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="120dp"
+                                android:layout_height="wrap_content"
+                                />
 
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
+                            <TextView
+                                android:id="@+id/tv_height"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                />
 
-                        <TextView
-                            android:text="@string/tx_details_size_weight"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="120dp"
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            />
+                            >
 
-                        <TextView
-                            android:id="@+id/tv_meta"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
+                            <TextView
+                                android:text="@string/tx_details_time"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="120dp"
+                                android:layout_height="wrap_content"
+                                />
+
+                            <TextView
+                                android:id="@+id/tv_time"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            />
+                            >
 
-                    </LinearLayout>
+                            <TextView
+                                android:text="@string/tx_details_age"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="120dp"
+                                android:layout_height="wrap_content"
+                                />
 
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
+                            <TextView
+                                android:id="@+id/tv_age"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                />
 
-                        <TextView
-                            android:text="@string/tx_details_confirmations"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="120dp"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <TextView
-                            android:id="@+id/tv_height"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
-
-                        <TextView
-                            android:text="@string/tx_details_time"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="120dp"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <TextView
-                            android:id="@+id/tv_time"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
-
-                        <TextView
-                            android:text="@string/tx_details_age"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="120dp"
-                            android:layout_height="wrap_content"
-                            />
-
-                        <TextView
-                            android:id="@+id/tv_age"
-                            android:textSize="14sp"
-                            android:textColor="@color/tx_text_secondary"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            />
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -355,6 +387,7 @@
 
             </androidx.cardview.widget.CardView>
 
+            <!-- CARD 3: Sent / Received details - collapsed by default -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_io"
                 android:layout_width="match_parent"
@@ -366,68 +399,84 @@
                 >
 
                 <LinearLayout
-                    android:padding="16dp"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     >
 
                     <TextView
+                        android:id="@+id/header_io"
                         android:text="@string/tx_details_sent_details"
                         android:textStyle="bold"
                         android:textSize="16sp"
                         android:textColor="@color/tx_text_primary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <TextView
-                        android:id="@+id/tv_from"
-                        android:textColor="@color/tx_text_secondary"
-                        android:textIsSelectable="true"
-                        android:fontFamily="monospace"
-                        android:textSize="13sp"
-                        android:lineSpacingExtra="2dp"
-                        android:breakStrategy="simple"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="12dp"
+                        android:padding="16dp"
+                        android:drawableEnd="@drawable/ic_expand_more"
+                        android:drawableTint="@color/tx_text_secondary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#33000000"
-                        />
-
-                    <TextView
-                        android:text="@string/tx_details_received_details"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:textColor="@color/tx_text_primary"
-                        android:layout_marginTop="12dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <TextView
-                        android:id="@+id/tv_to"
-                        android:textColor="@color/tx_text_secondary"
-                        android:textIsSelectable="true"
-                        android:fontFamily="monospace"
-                        android:textSize="13sp"
-                        android:lineSpacingExtra="2dp"
-                        android:breakStrategy="simple"
-                        android:layout_marginTop="4dp"
+                    <LinearLayout
+                        android:id="@+id/content_io"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:paddingTop="0dp"
+                        android:visibility="gone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        />
+                        >
+
+                        <TextView
+                            android:id="@+id/tv_from"
+                            android:textColor="@color/tx_text_secondary"
+                            android:textIsSelectable="true"
+                            android:fontFamily="monospace"
+                            android:textSize="13sp"
+                            android:lineSpacingExtra="2dp"
+                            android:breakStrategy="simple"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="12dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#33000000"
+                            />
+
+                        <TextView
+                            android:text="@string/tx_details_received_details"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/tx_text_primary"
+                            android:layout_marginTop="12dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <TextView
+                            android:id="@+id/tv_to"
+                            android:textColor="@color/tx_text_secondary"
+                            android:textIsSelectable="true"
+                            android:fontFamily="monospace"
+                            android:textSize="13sp"
+                            android:lineSpacingExtra="2dp"
+                            android:breakStrategy="simple"
+                            android:layout_marginTop="4dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
+            <!-- CARD 4: TXID - collapsed by default -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_txid"
                 android:layout_width="match_parent"
@@ -438,31 +487,46 @@
                 >
 
                 <LinearLayout
-                    android:padding="16dp"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     >
 
                     <TextView
+                        android:id="@+id/header_txid"
                         android:text="@string/tx_details_transaction_id"
                         android:textStyle="bold"
                         android:textSize="16sp"
                         android:textColor="@color/tx_text_primary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
-
-                    <TextView
-                        android:id="@+id/tv_txid"
-                        android:textColor="@color/tx_text_secondary"
-                        android:textIsSelectable="true"
-                        android:fontFamily="monospace"
-                        android:textSize="13sp"
-                        android:layout_marginTop="4dp"
+                        android:padding="16dp"
+                        android:drawableEnd="@drawable/ic_expand_more"
+                        android:drawableTint="@color/tx_text_secondary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         />
+
+                    <LinearLayout
+                        android:id="@+id/content_txid"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:paddingTop="0dp"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+
+                        <TextView
+                            android:id="@+id/tv_txid"
+                            android:textColor="@color/tx_text_secondary"
+                            android:textIsSelectable="true"
+                            android:fontFamily="monospace"
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
