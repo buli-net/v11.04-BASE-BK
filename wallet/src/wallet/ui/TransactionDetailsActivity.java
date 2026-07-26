@@ -964,9 +964,10 @@ public class TransactionDetailsActivity extends Activity {
             try { updateTime = tx.getUpdateTime(); } catch (Exception ignored) {}
             tvAge.setText(formatAge(updateTime));
         }
-      //  updateLiveQr();
+        updateLiveQr();
+    }
 
-        private void updateLiveQr() {
+private void updateLiveQr() {
     try {
         String text = buildLiveTxText();
         if (ivQr != null) {
@@ -982,8 +983,7 @@ public class TransactionDetailsActivity extends Activity {
         }
     } catch (Exception e) { e.printStackTrace(); }
 }
-    }
-
+    
     // Setup accordion behavior like main wallet screen
 // Initial state: only header card is expanded, others collapsed showing only title
 // On click: expand full, change background to expanded color, collapse others
