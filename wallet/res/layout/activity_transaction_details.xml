@@ -30,7 +30,7 @@
         android:id="@+id/card_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="0dp"
+        android:layout_margin="2dp"
         app:cardCornerRadius="2dp"
         app:cardElevation="12dp"
         app:cardBackgroundColor="@color/bg_level1">
