@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Bitcoin Wallet - Transaction Details Layout
+    Copyright (C) 2026 Bitcoin Wallet Developers
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
 <!-- Root coordinator for parallax header effect like main wallet screen -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -8,7 +26,8 @@
     android:background="@color/tx_page_bg"
     >
 
-    <!-- Header card - always expanded, contains QR, same style as main balance card -->
+    <!-- Header card - always expanded, contains direction, amount and QR code -->
+    <!-- This card mimics main wallet balance card with levitate tag for parallax effect -->
     <androidx.cardview.widget.CardView
         android:id="@+id/card_header"
         android:layout_width="match_parent"
@@ -70,7 +89,8 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!-- Scrollable content with shared system scrollbar -->
+    <!-- Scrollable content with shared system scrollbar - auto theme -->
+    <!-- NestedScrollView holds all accordion cards below header -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nested_scroll"
         android:layout_width="match_parent"
@@ -90,7 +110,8 @@
             android:padding="8dp"
             >
 
-            <!-- CARD 1: Sender / Receiver - collapsed by default, only header visible -->
+            <!-- CARD 1: Sender / Receiver - collapsed by default -->
+            <!-- Header shows title only, content contains actual from/to (filtered real addresses, not all inputs/outputs) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_sender"
                 android:layout_width="match_parent"
@@ -107,6 +128,8 @@
                     android:layout_height="wrap_content"
                     >
 
+                    <!-- Clickable header - expands/collapses content_sender -->
+                    <!-- Uses system selectableItemBackground for touch feedback (system flash, not app) -->
                     <TextView
                         android:id="@+id/header_sender"
                         android:text="@string/tx_details_sender_receiver"
@@ -123,6 +146,7 @@
                         android:layout_height="wrap_content"
                         />
 
+                    <!-- Collapsible content - GONE by default, shown on header click -->
                     <LinearLayout
                         android:id="@+id/content_sender"
                         android:orientation="vertical"
@@ -189,6 +213,7 @@
             </androidx.cardview.widget.CardView>
 
             <!-- CARD 2: Transaction details - collapsed by default -->
+            <!-- Contains status, fee, size, confirmations, time, age -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_tx_details"
                 android:layout_width="match_parent"
@@ -391,7 +416,9 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- CARD 3: Sent / Received details - collapsed by default -->
+            <!-- CARD 3: Send / Receive details - collapsed by default -->
+            <!-- Fixed header title using string resource, not inner content title -->
+            <!-- Inner content has two sub-sections: Sent details and Received details -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_io"
                 android:layout_width="match_parent"
@@ -408,9 +435,11 @@
                     android:layout_height="wrap_content"
                     >
 
+                    <!-- Common parent title for both sent and received sections -->
+                    <!-- Uses @string/tx_details_send_receive_details for localization -->
                     <TextView
                         android:id="@+id/header_io"
-                        android:text="@string/tx_details_sent_details"
+                        android:text="@string/tx_details_send_receive_details"
                         android:textStyle="bold"
                         android:textSize="16sp"
                         android:textColor="@color/tx_text_primary"
@@ -433,6 +462,16 @@
                         android:layout_height="wrap_content"
                         >
 
+                        <!-- Sub-title for sent inputs - kept inside content, not used as card header -->
+                        <TextView
+                            android:text="@string/tx_details_sent_details"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/tx_text_primary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            />
+
                         <TextView
                             android:id="@+id/tv_from"
                             android:textColor="@color/tx_text_secondary"
@@ -453,6 +492,7 @@
                             android:background="#33000000"
                             />
 
+                        <!-- Sub-title for received outputs - kept inside content -->
                         <TextView
                             android:text="@string/tx_details_received_details"
                             android:textStyle="bold"
@@ -482,7 +522,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- CARD 4: TXID - collapsed by default -->
+            <!-- CARD 4: Transaction ID - collapsed by default -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_txid"
                 android:layout_width="match_parent"
