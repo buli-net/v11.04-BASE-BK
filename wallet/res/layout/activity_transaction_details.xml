@@ -142,12 +142,15 @@
                             android:clickable="false"
                             android:focusable="false" />
 
-                        <!-- Copy icon has its own clickable to block parent ripple -->
+                        <!-- Copy icon - circular ripple -->
                         <ImageView
                             android:id="@+id/ic_copy_sender"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="6dp"
+                            android:clipToOutline="true"
                             android:clickable="true"
                             android:focusable="true"
                             android:contentDescription="@string/tx_details_copied" />
@@ -266,9 +269,12 @@
 
                         <ImageView
                             android:id="@+id/ic_copy_details"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="6dp"
+                            android:clipToOutline="true"
                             android:clickable="true"
                             android:focusable="true"
                             android:contentDescription="@string/tx_details_copied" />
@@ -507,9 +513,12 @@
 
                         <ImageView
                             android:id="@+id/ic_copy_io"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="6dp"
+                            android:clipToOutline="true"
                             android:clickable="true"
                             android:focusable="true"
                             android:contentDescription="@string/tx_details_copied" />
@@ -628,9 +637,12 @@
 
                         <ImageView
                             android:id="@+id/ic_copy_txid"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="6dp"
+                            android:clipToOutline="true"
                             android:clickable="true"
                             android:focusable="true"
                             android:contentDescription="@string/tx_details_copied" />
