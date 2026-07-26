@@ -750,20 +750,22 @@ public class TransactionDetailsActivity extends Activity {
 
     private String getTv(TextView tv) { return tv != null && tv.getText() != null ? tv.getText().toString() : ""; }
 
-    private void updateLiveQr() {
-        try {
-            String text = buildLiveTxText();
-            if (ivQr != null) {
-                currentQrBitmap = encodeQr(text, 768);
-                ivQr.setImageBitmap(currentQrBitmap);
-            }
-            if (qrDialog != null && qrDialog.isShowing() && qrDialogImageView != null) {
-                Bitmap big = encodeQr(text, 1024);
-                qrDialogImageView.setImageBitmap(big);
-                currentQrBitmap = big;
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-    }
+private void updateLiveQr() {
+    try {
+        String text = buildLiveTxText();
+        if (ivQr != null) {
+            Bitmap small = encodeQrTransparent(text, 768); // nhỏ trong suốt -> ăn background XML
+            ivQr.setImageBitmap(small);
+        }
+        if (qrDialog != null && qrDialog.isShowing() && qrDialogImageView != null) {
+            Bitmap big = encodeQr(text, 1024); // to vẫn nền trắng để dark thấy, save cũng trắng
+            qrDialogImageView.setImageBitmap(big);
+            currentQrBitmap = big;
+        } else {
+            currentQrBitmap = encodeQr(text, 1024); // để save/share vẫn là bản trắng
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+}
 
     private void copyFullTx() { copy(buildLiveTxText()); }
 
@@ -966,23 +968,6 @@ public class TransactionDetailsActivity extends Activity {
         }
         updateLiveQr();
     }
-
-private void updateLiveQr() {
-    try {
-        String text = buildLiveTxText();
-        if (ivQr != null) {
-            Bitmap small = encodeQrTransparent(text, 768); // nhỏ trong suốt -> ăn background XML
-            ivQr.setImageBitmap(small);
-        }
-        if (qrDialog != null && qrDialog.isShowing() && qrDialogImageView != null) {
-            Bitmap big = encodeQr(text, 1024); // to vẫn nền trắng để dark thấy, save cũng trắng
-            qrDialogImageView.setImageBitmap(big);
-            currentQrBitmap = big;
-        } else {
-            currentQrBitmap = encodeQr(text, 1024); // để save/share vẫn là bản trắng
-        }
-    } catch (Exception e) { e.printStackTrace(); }
-}
     
     // Setup accordion behavior like main wallet screen
 // Initial state: only header card is expanded, others collapsed showing only title
