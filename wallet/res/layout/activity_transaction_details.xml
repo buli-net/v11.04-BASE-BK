@@ -36,7 +36,7 @@
         android:tag="levitate"
         app:cardCornerRadius="2dp"
         app:cardElevation="12dp"
-        android:background="@color/bg_level0">
+        app:cardBackgroundColor="@color/bg_level1">
         >
         
         <RelativeLayout
