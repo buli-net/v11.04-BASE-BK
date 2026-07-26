@@ -32,13 +32,13 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         app:cardCornerRadius="2dp"
-        app:cardElevation="8dp"
+        app:cardElevation="12dp"
         app:cardBackgroundColor="@color/bg_level1">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:padding="12dp">
 
             <!-- Small QR - background controlled by XML -->
             <ImageView
@@ -100,7 +100,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp">
+            android:padding="12dp">
 
             <!-- CARD 1: Sender / Receiver -->
             <androidx.cardview.widget.CardView
@@ -144,8 +144,8 @@
 
                         <ImageView
                             android:id="@+id/ic_copy_sender"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
                             android:background="?android:attr/selectableItemBackgroundBorderless"
                             android:clickable="true"
@@ -266,8 +266,8 @@
 
                         <ImageView
                             android:id="@+id/ic_copy_details"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
                             android:background="?android:attr/selectableItemBackgroundBorderless"
                             android:clickable="true"
@@ -508,8 +508,8 @@
 
                         <ImageView
                             android:id="@+id/ic_copy_io"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
                             android:background="?android:attr/selectableItemBackgroundBorderless"
                             android:clickable="true"
@@ -630,8 +630,8 @@
 
                         <ImageView
                             android:id="@+id/ic_copy_txid"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:src="@drawable/ic_copy_text_color_primary_24dp"
                             android:background="?android:attr/selectableItemBackgroundBorderless"
                             android:clickable="true"
