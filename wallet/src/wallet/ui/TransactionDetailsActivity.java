@@ -973,7 +973,7 @@ private void updateLiveQr() {
 // Initial state: only header card is expanded, others collapsed showing only title
 // On click: expand full, change background to expanded color, collapse others
 private void setupExpandableCards() {
-    ViewGroup container = (ViewGroup) findViewById(R.id.nested_scroll).getChildAt(0);
+    ViewGroup container = (ViewGroup) ((ViewGroup) findViewById(R.id.nested_scroll)).getChildAt(0);
     
     View.OnClickListener toggle = v -> {
         View target = null;
@@ -985,7 +985,7 @@ private void setupExpandableCards() {
 
         boolean expand = target.getVisibility()!=View.VISIBLE;
 
-        // auto animate layout changes - không cần lib transition
+        // auto animate layout changes
         android.animation.LayoutTransition lt = new android.animation.LayoutTransition();
         lt.enableTransitionType(android.animation.LayoutTransition.CHANGING);
         lt.setDuration(200);
