@@ -13,6 +13,6 @@
     <color name="tx_card_expanded">#ffffff</color>
 
      <!-- bg qr show transacsion -->
-    <color name="qr_background">#ffffff</color>
+    <color name="qr_background">#ffa0a8b0</color>
   
 </resources>
