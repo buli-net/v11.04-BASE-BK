@@ -1230,7 +1230,7 @@ public class TransactionDetailsActivity extends Activity {
         cardHeader.setLayoutParams(layoutParams);
         cardHeader.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             int height = bottom - top;
-            int extra = (int) (8 * getResources().getDisplayMetrics().density);
+            int extra = (int) (0 * getResources().getDisplayMetrics().density);
             scroll.setPadding(scroll.getPaddingLeft(), height + extra, scroll.getPaddingRight(), scroll.getPaddingBottom());
         });
     }
