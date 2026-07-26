@@ -33,8 +33,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="0dp"
+        android:tag="levitate"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="12dp"
         android:background="@color/bg_level1">
         >
         
