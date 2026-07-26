@@ -10,6 +10,9 @@
     <color name="tx_status_pending">#e68a00</color>
     <color name="tx_status_building">#1976d2</color>
 
-    <color name="tx_card_expanded">#E8EBD9</color>
+    <color name="tx_card_expanded">#fff2f2f8</color>
+
+     <!-- bg qr show transacsion -->
+    <color name="qr_background">#E5E7EB</color>
   
 </resources>
