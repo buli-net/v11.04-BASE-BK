@@ -23,28 +23,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/tx_page_bg"
-    >
+    android:background="@color/tx_page_bg">
 
-    <!-- Header card - always expanded, contains direction, amount and QR code -->
-    <!-- This card mimics main wallet balance card with levitate tag for parallax effect -->
+    <!--
+        Header card - always expanded
+        - Contains direction (Received/Sent), amount and small QR
+        - Small QR uses transparent bitmap + XML white background for size control
+        - Big QR in dialog uses white bitmap for dark mode visibility and saving
+    -->
     <androidx.cardview.widget.CardView
         android:id="@+id/card_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:tag="levitate"
         app:cardCornerRadius="2dp"
-        app:cardElevation="12dp"
+        app:cardElevation="16dp"
         app:cardBackgroundColor="@color/bg_level1">
-        >
-        
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            >
+            android:padding="12dp">
 
+            <!-- Small QR - background controlled by XML -->
             <ImageView
                 android:id="@+id/iv_tx_qr"
                 android:layout_width="72dp"
@@ -52,14 +53,14 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:scaleType="fitCenter"
-                android:padding="4dp"
+                android:padding="3dp"
                 android:background="@drawable/bg_qr_white_rounded"
                 android:clipToOutline="true"
                 android:clickable="true"
                 android:focusable="true"
-                android:contentDescription="@string/tx_details_qr_desc"
-                />
+                android:contentDescription="@string/tx_details_qr_desc" />
 
+            <!-- Direction label e.g. Received -->
             <TextView
                 android:id="@+id/tv_direction"
                 android:layout_width="match_parent"
@@ -70,9 +71,9 @@
                 android:textStyle="bold"
                 android:textSize="22sp"
                 android:textColor="@color/tx_text_primary"
-                android:fontFamily="sans-serif-medium"
-                />
+                android:fontFamily="sans-serif-medium" />
 
+            <!-- Amount label e.g. +0.00002115 BTC -->
             <TextView
                 android:id="@+id/tv_amount"
                 android:layout_width="match_parent"
@@ -80,17 +81,15 @@
                 android:layout_below="@id/tv_direction"
                 android:layout_alignStart="@id/tv_direction"
                 android:layout_toStartOf="@id/iv_tx_qr"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="2dp"
                 android:textSize="22sp"
-                android:textStyle="bold"
-                />
+                android:textStyle="bold" />
 
         </RelativeLayout>
 
     </androidx.cardview.widget.CardView>
 
-    <!-- Scrollable content with shared system scrollbar - auto theme -->
-    <!-- NestedScrollView holds all accordion cards below header -->
+    <!-- Scrollable content with system scrollbar -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nested_scroll"
         android:layout_width="match_parent"
@@ -100,18 +99,15 @@
         android:overScrollMode="never"
         android:scrollbars="vertical"
         android:fadeScrollbars="true"
-        android:scrollbarStyle="outsideOverlay"
-        >
+        android:scrollbarStyle="outsideOverlay">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            >
+            android:padding="8dp">
 
-            <!-- CARD 1: Sender / Receiver - collapsed by default -->
-            <!-- Header shows title only, content contains actual from/to (filtered real addresses, not all inputs/outputs) -->
+            <!-- CARD 1: Sender / Receiver -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_sender"
                 android:layout_width="match_parent"
@@ -119,34 +115,46 @@
                 app:cardCornerRadius="2dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/tx_card_bg"
-                android:layout_marginBottom="8dp"
-                >
+                android:layout_marginBottom="8dp">
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
+                    android:layout_height="wrap_content">
 
-                    <!-- Clickable header - expands/collapses content_sender -->
-                    <!-- Uses system selectableItemBackground for touch feedback (system flash, not app) -->
-                    <TextView
+                    <!-- Header: click to expand/collapse, icon to copy this card only -->
+                    <LinearLayout
                         android:id="@+id/header_sender"
-                        android:text="@string/tx_details_sender_receiver"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:textColor="@color/tx_text_primary"
-                        android:padding="16dp"
-                        android:drawableEnd="@android:drawable/arrow_down_float"
+                        android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:padding="16dp"
                         android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        />
+                        android:layout_height="wrap_content">
 
-                    <!-- Collapsible content - GONE by default, shown on header click -->
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/tx_details_sender_receiver"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/tx_text_primary" />
+
+                        <ImageView
+                            android:id="@+id/ic_copy_sender"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_copy_text_color_primary_24dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/tx_details_copy" />
+
+                    </LinearLayout>
+
+                    <!-- Collapsible content -->
                     <LinearLayout
                         android:id="@+id/content_sender"
                         android:orientation="vertical"
@@ -155,8 +163,7 @@
                         android:paddingBottom="16dp"
                         android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
+                        android:layout_height="wrap_content">
 
                         <TextView
                             android:text="@string/tx_details_from"
@@ -164,8 +171,7 @@
                             android:textSize="14sp"
                             android:textColor="@color/tx_text_secondary"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_height="wrap_content" />
 
                         <TextView
                             android:id="@+id/tv_actual_from"
@@ -175,16 +181,14 @@
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_height="wrap_content" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_marginTop="12dp"
                             android:layout_marginBottom="12dp"
-                            android:background="#33000000"
-                            />
+                            android:background="#33000000" />
 
                         <TextView
                             android:text="@string/tx_details_to"
@@ -192,8 +196,7 @@
                             android:textSize="14sp"
                             android:textColor="@color/tx_text_secondary"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_height="wrap_content" />
 
                         <TextView
                             android:id="@+id/tv_actual_to"
@@ -203,8 +206,7 @@
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_height="wrap_content" />
 
                     </LinearLayout>
 
@@ -212,8 +214,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- CARD 2: Transaction details - collapsed by default -->
-            <!-- Contains status, fee, size, confirmations, time, age -->
+            <!-- CARD 2: Transaction details -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_tx_details"
                 android:layout_width="match_parent"
@@ -221,29 +222,43 @@
                 app:cardCornerRadius="2dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/tx_card_bg"
-                android:layout_marginBottom="8dp"
-                >
+                android:layout_marginBottom="8dp">
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
+                    android:layout_height="wrap_content">
 
-                    <TextView
+                    <LinearLayout
                         android:id="@+id/header_tx_details"
-                        android:text="@string/tx_details_transaction_details"
-                        android:textStyle="bold"
-                        android:textColor="@color/tx_text_primary"
-                        android:textSize="16sp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="16dp"
-                        android:drawableEnd="@android:drawable/arrow_down_float"
                         android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        />
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/tx_details_transaction_details"
+                            android:textStyle="bold"
+                            android:textColor="@color/tx_text_primary"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:id="@+id/ic_copy_details"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_copy_text_color_primary_24dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/tx_details_copy" />
+
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/content_tx_details"
@@ -252,22 +267,19 @@
                         android:paddingTop="0dp"
                         android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
+                        android:layout_height="wrap_content">
 
                         <LinearLayout
                             android:orientation="horizontal"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            >
+                            android:layout_height="wrap_content">
 
                             <TextView
                                 android:text="@string/tx_details_status"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                             <TextView
                                 android:id="@+id/tv_status"
@@ -275,8 +287,7 @@
                                 android:textStyle="bold"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                         </LinearLayout>
 
@@ -284,16 +295,14 @@
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            >
+                            android:layout_height="wrap_content">
 
                             <TextView
                                 android:text="@string/tx_details_fee"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                             <TextView
                                 android:id="@+id/tv_fee"
@@ -301,8 +310,7 @@
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                         </LinearLayout>
 
@@ -310,16 +318,14 @@
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            >
+                            android:layout_height="wrap_content">
 
                             <TextView
                                 android:text="@string/tx_details_size_weight"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                             <TextView
                                 android:id="@+id/tv_meta"
@@ -327,8 +333,7 @@
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                         </LinearLayout>
 
@@ -336,16 +341,14 @@
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            >
+                            android:layout_height="wrap_content">
 
                             <TextView
                                 android:text="@string/tx_details_confirmations"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                             <TextView
                                 android:id="@+id/tv_height"
@@ -353,8 +356,7 @@
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                         </LinearLayout>
 
@@ -362,16 +364,14 @@
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            >
+                            android:layout_height="wrap_content">
 
                             <TextView
                                 android:text="@string/tx_details_time"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                             <TextView
                                 android:id="@+id/tv_time"
@@ -379,8 +379,7 @@
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                         </LinearLayout>
 
@@ -388,16 +387,14 @@
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            >
+                            android:layout_height="wrap_content">
 
                             <TextView
                                 android:text="@string/tx_details_age"
                                 android:textSize="14sp"
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                             <TextView
                                 android:id="@+id/tv_age"
@@ -405,8 +402,7 @@
                                 android:textColor="@color/tx_text_secondary"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                />
+                                android:layout_height="wrap_content" />
 
                         </LinearLayout>
 
@@ -416,9 +412,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- CARD 3: Send / Receive details - collapsed by default -->
-            <!-- Fixed header title using string resource, not inner content title -->
-            <!-- Inner content has two sub-sections: Sent details and Received details -->
+            <!-- CARD 3: Send / Receive details -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_io"
                 android:layout_width="match_parent"
@@ -426,31 +420,43 @@
                 app:cardCornerRadius="2dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/tx_card_bg"
-                android:layout_marginBottom="8dp"
-                >
+                android:layout_marginBottom="8dp">
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
+                    android:layout_height="wrap_content">
 
-                    <!-- Common parent title for both sent and received sections -->
-                    <!-- Uses @string/tx_details_send_receive_details for localization -->
-                    <TextView
+                    <LinearLayout
                         android:id="@+id/header_io"
-                        android:text="@string/tx_details_send_receive_details"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:textColor="@color/tx_text_primary"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="16dp"
-                        android:drawableEnd="@android:drawable/arrow_down_float"
                         android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        />
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/tx_details_send_receive_details"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/tx_text_primary" />
+
+                        <ImageView
+                            android:id="@+id/ic_copy_io"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_copy_text_color_primary_24dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/tx_details_copy" />
+
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/content_io"
@@ -459,18 +465,15 @@
                         android:paddingTop="0dp"
                         android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
+                        android:layout_height="wrap_content">
 
-                        <!-- Sub-title for sent inputs - kept inside content, not used as card header -->
                         <TextView
                             android:text="@string/tx_details_sent_details"
                             android:textStyle="bold"
                             android:textSize="16sp"
                             android:textColor="@color/tx_text_primary"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_height="wrap_content" />
 
                         <TextView
                             android:id="@+id/tv_from"
@@ -483,16 +486,13 @@
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="12dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_height="wrap_content" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:background="#33000000"
-                            />
+                            android:background="#33000000" />
 
-                        <!-- Sub-title for received outputs - kept inside content -->
                         <TextView
                             android:text="@string/tx_details_received_details"
                             android:textStyle="bold"
@@ -500,8 +500,7 @@
                             android:textColor="@color/tx_text_primary"
                             android:layout_marginTop="12dp"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_height="wrap_content" />
 
                         <TextView
                             android:id="@+id/tv_to"
@@ -513,8 +512,7 @@
                             android:breakStrategy="simple"
                             android:layout_marginTop="4dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_height="wrap_content" />
 
                     </LinearLayout>
 
@@ -522,36 +520,50 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- CARD 4: Transaction ID - collapsed by default -->
+            <!-- CARD 4: Transaction ID -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_txid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="2dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/tx_card_bg"
-                >
+                app:cardBackgroundColor="@color/tx_card_bg">
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
+                    android:layout_height="wrap_content">
 
-                    <TextView
+                    <LinearLayout
                         android:id="@+id/header_txid"
-                        android:text="@string/tx_details_transaction_id"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:textColor="@color/tx_text_primary"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="16dp"
-                        android:drawableEnd="@android:drawable/arrow_down_float"
                         android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        />
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:text="@string/tx_details_transaction_id"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="@color/tx_text_primary" />
+
+                        <ImageView
+                            android:id="@+id/ic_copy_txid"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_copy_text_color_primary_24dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/tx_details_copy" />
+
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/content_txid"
@@ -560,8 +572,7 @@
                         android:paddingTop="0dp"
                         android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        >
+                        android:layout_height="wrap_content">
 
                         <TextView
                             android:id="@+id/tv_txid"
@@ -571,8 +582,7 @@
                             android:textSize="13sp"
                             android:layout_marginTop="4dp"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_height="wrap_content" />
 
                     </LinearLayout>
 
