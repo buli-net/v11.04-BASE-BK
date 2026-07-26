@@ -42,7 +42,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:padding="12dp"
             >
 
             <ImageView
@@ -68,7 +68,7 @@
                 android:layout_toStartOf="@id/iv_tx_qr"
                 android:layout_marginEnd="12dp"
                 android:textStyle="bold"
-                android:textSize="28sp"
+                android:textSize="18sp"
                 android:textColor="@color/tx_text_primary"
                 android:fontFamily="sans-serif-medium"
                 />
@@ -81,7 +81,7 @@
                 android:layout_alignStart="@id/tv_direction"
                 android:layout_toStartOf="@id/iv_tx_qr"
                 android:layout_marginTop="4dp"
-                android:textSize="28sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 />
 
