@@ -888,6 +888,20 @@ public class TransactionDetailsActivity extends Activity {
         return bmp;
     }
 
+    public static Bitmap encodeQrTransparent(String text, int size) throws WriterException {
+    QRCodeWriter writer = new QRCodeWriter();
+    Map<EncodeHintType, Object> hints = new HashMap<>();
+    hints.put(EncodeHintType.MARGIN, 1);
+    hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+    BitMatrix bitMatrix = writer.encode(text, BarcodeFormat.QR_CODE, size, size, hints);
+    int w = bitMatrix.getWidth();
+    int h = bitMatrix.getHeight();
+    Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+    for (int x = 0; x < w; x++) for (int y = 0; y < h; y++) 
+        bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.TRANSPARENT);
+    return bmp;
+}
+
     private String formatAge(Date txTime) {
         if (txTime == null) return getString(R.string.tx_details_dash);
         java.util.Calendar then = java.util.Calendar.getInstance();
@@ -950,7 +964,24 @@ public class TransactionDetailsActivity extends Activity {
             try { updateTime = tx.getUpdateTime(); } catch (Exception ignored) {}
             tvAge.setText(formatAge(updateTime));
         }
-        updateLiveQr();
+      //  updateLiveQr();
+
+        private void updateLiveQr() {
+    try {
+        String text = buildLiveTxText();
+        if (ivQr != null) {
+            Bitmap small = encodeQrTransparent(text, 768); // nhỏ trong suốt -> ăn background XML
+            ivQr.setImageBitmap(small);
+        }
+        if (qrDialog != null && qrDialog.isShowing() && qrDialogImageView != null) {
+            Bitmap big = encodeQr(text, 1024); // to vẫn nền trắng để dark thấy, save cũng trắng
+            qrDialogImageView.setImageBitmap(big);
+            currentQrBitmap = big;
+        } else {
+            currentQrBitmap = encodeQr(text, 1024); // để save/share vẫn là bản trắng
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+}
     }
 
     // Setup accordion behavior like main wallet screen
