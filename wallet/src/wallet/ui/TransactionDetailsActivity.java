@@ -977,15 +977,25 @@ private void setupExpandableCards() {
     
     View.OnClickListener toggle = v -> {
         View target = null;
-        if(v.getId()==R.id.header_sender) target = findViewById(R.id.content_sender);
-        else if(v.getId()==R.id.header_tx_details) target = findViewById(R.id.content_tx_details);
-        else if(v.getId()==R.id.header_io) target = findViewById(R.id.content_io);
-        else if(v.getId()==R.id.header_txid) target = findViewById(R.id.content_txid);
+        androidx.cardview.widget.CardView targetCard = null;
+        
+        if(v.getId()==R.id.header_sender) {
+            target = findViewById(R.id.content_sender);
+            targetCard = findViewById(R.id.card_sender);
+        } else if(v.getId()==R.id.header_tx_details) {
+            target = findViewById(R.id.content_tx_details);
+            targetCard = findViewById(R.id.card_tx_details);
+        } else if(v.getId()==R.id.header_io) {
+            target = findViewById(R.id.content_io);
+            targetCard = findViewById(R.id.card_io);
+        } else if(v.getId()==R.id.header_txid) {
+            target = findViewById(R.id.content_txid);
+            targetCard = findViewById(R.id.card_txid);
+        }
         if(target==null) return;
 
         boolean expand = target.getVisibility()!=View.VISIBLE;
 
-        // auto animate layout changes
         android.animation.LayoutTransition lt = new android.animation.LayoutTransition();
         lt.enableTransitionType(android.animation.LayoutTransition.CHANGING);
         lt.setDuration(200);
@@ -996,7 +1006,15 @@ private void setupExpandableCards() {
         findViewById(R.id.content_io).setVisibility(View.GONE);
         findViewById(R.id.content_txid).setVisibility(View.GONE);
 
-        if(expand) target.setVisibility(View.VISIBLE);
+        ((androidx.cardview.widget.CardView)findViewById(R.id.card_sender)).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
+        ((androidx.cardview.widget.CardView)findViewById(R.id.card_tx_details)).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
+        ((androidx.cardview.widget.CardView)findViewById(R.id.card_io)).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
+        ((androidx.cardview.widget.CardView)findViewById(R.id.card_txid)).setCardBackgroundColor(getResources().getColor(R.color.tx_card_bg));
+
+        if(expand) {
+            target.setVisibility(View.VISIBLE);
+            targetCard.setCardBackgroundColor(getResources().getColor(R.color.tx_card_expanded));
+        }
     };
     
     findViewById(R.id.header_sender).setOnClickListener(toggle);
