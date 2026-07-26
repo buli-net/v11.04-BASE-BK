@@ -30,7 +30,7 @@
         android:id="@+id/card_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="0dp"
         app:cardCornerRadius="2dp"
         app:cardElevation="12dp"
         app:cardBackgroundColor="@color/bg_level1">
@@ -38,7 +38,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp">
+            android:padding="10dp">
 
             <!-- Small QR - background controlled by XML -->
             <ImageView
