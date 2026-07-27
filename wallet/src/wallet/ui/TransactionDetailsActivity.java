@@ -8,11 +8,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package wallet.ui;
@@ -85,6 +85,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import wallet.R;
 import wallet.WalletApplication;
@@ -246,12 +247,21 @@ public class TransactionDetailsActivity extends Activity {
         try { fee = tx.getFee(); } catch (Exception ignored) {}
         tvFee.setText(fee!= null? fee.toPlainString() + getString(R.string.tx_details_btc_suffix) : getString(R.string.tx_details_dash));
 
-        // --- Time display ---
+        // --- Time display (OFFLINE SYSTEM TIME - NO API) ---
         Date updateTime = null;
-        try { updateTime = tx.getUpdateTime(); } catch (Exception ignored) {}
-        tvTime.setText(updateTime!= null? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(updateTime) : getString(R.string.tx_details_dash));
+        try {
+            updateTime = tx.getUpdateTime();
+        } catch (Exception ignored) {
+        }
+        if (updateTime!= null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            sdf.setTimeZone(TimeZone.getDefault());
+            tvTime.setText(sdf.format(updateTime));
+        } else {
+            tvTime.setText(getString(R.string.tx_details_dash));
+        }
 
-        // --- Size / weight / RBF / fee rate ---
+        // --- Size / weight / RBF / fee rate (initial, will be live in refreshLiveFields) ---
         int size = 0, weight = 0;
         boolean rbf = false;
         try { size = tx.getMessageSize(); } catch (Exception ignored) {}
@@ -1062,18 +1072,40 @@ public class TransactionDetailsActivity extends Activity {
     /**
      * Refresh live UI fields that change over time or with chain updates:
      * - Status (pending/building/confirmed) based on depth
-     * - Confirmation height string
+     * - Confirmation height string as txBlock / currentBlock OFFLINE
+     * - Size/Weight/RBF live OFFLINE
+     * - Time offline system
      * - Age (calls formatAge)
-     * - QR (contains live age and status)
+     * - QR (contains live age and status, blocks, RBF, time)
      */
     private void refreshLiveFields() {
         if (tx == null || tvStatus == null || tvHeight == null) return;
+
         TransactionConfidence confidence = tx.getConfidence();
-        int depth = 0, height = 0;
+        int depth = 0;
+        int txBlockHeight = 0;
         if (confidence!= null) {
             try { depth = confidence.getDepthInBlocks(); } catch (Exception ignored) {}
-            try { height = confidence.getAppearedAtChainHeight(); } catch (Exception ignored) {}
+            try { txBlockHeight = confidence.getAppearedAtChainHeight(); } catch (Exception ignored) {}
         }
+
+        // --- Current chain height OFFLINE - NO API ---
+        int currentBlockHeight = 0;
+        try {
+            if (wallet!= null) {
+                currentBlockHeight = wallet.getLastBlockSeenHeight();
+            }
+        } catch (Exception ignored) {}
+        if (currentBlockHeight <= 0) {
+            try {
+                WalletApplication app = (WalletApplication) getApplication();
+                if (app!= null && app.getBlockChain()!= null && app.getBlockChain().getChainHead()!= null) {
+                    currentBlockHeight = app.getBlockChain().getChainHead().getHeight();
+                }
+            } catch (Exception ignored) {}
+        }
+
+        // --- Status live ---
         String statusText;
         int statusColorRes;
         if (depth <= 0) {
@@ -1088,13 +1120,70 @@ public class TransactionDetailsActivity extends Activity {
         }
         tvStatus.setText(statusText);
         try { tvStatus.setTextColor(getResources().getColor(statusColorRes)); } catch (Exception ignored) {}
-        String confStr = depth <= 0? getString(R.string.tx_details_unconfirmed) : getString(R.string.tx_details_confirmations_value, depth, height);
+
+        // --- Confirmations + block tx/current OFFLINE LIVE ---
+        String confStr;
+        if (depth <= 0) {
+            confStr = getString(R.string.tx_details_unconfirmed);
+            if (currentBlockHeight > 0) {
+                confStr = confStr + " · " + currentBlockHeight;
+            }
+        } else {
+            if (currentBlockHeight > 0 && txBlockHeight > 0) {
+                confStr = depth + " " + getString(R.string.tx_details_confirmations_label) + " · khối " + txBlockHeight + "/" + currentBlockHeight;
+            } else {
+                confStr = getString(R.string.tx_details_confirmations_value, depth, txBlockHeight);
+            }
+        }
         tvHeight.setText(confStr);
+
+        // --- Size / Weight / RBF LIVE OFFLINE - NO API ---
+        try {
+            int size = 0;
+            int weight = 0;
+            boolean rbf = false;
+            try { size = tx.getMessageSize(); } catch (Exception ignored) {}
+            try { weight = tx.getWeight(); } catch (Exception ignored) {}
+            try { rbf = tx.isOptInFullRBF(); } catch (Exception ignored) {}
+
+            Coin fee = null;
+            try { fee = tx.getFee(); } catch (Exception ignored) {}
+
+            String feeRate = "";
+            if (fee!= null && weight > 0) {
+                try {
+                    long satPerVbyte = fee.getValue() * 4 / weight;
+                    feeRate = " · " + satPerVbyte + getString(R.string.tx_details_fee_rate_suffix);
+                } catch (Exception ignored) {}
+            }
+
+            String meta = size + " bytes · " + weight + " wu" + feeRate + (rbf? " · RBF" : "");
+            if (tvMeta!= null) {
+                tvMeta.setText(meta);
+            }
+        } catch (Exception ignored) {}
+
+        // --- Time OFFLINE SYSTEM - NO API - update live formatting with system timezone ---
+        try {
+            if (tvTime!= null) {
+                Date updateTime = null;
+                try { updateTime = tx.getUpdateTime(); } catch (Exception ignored) {}
+                if (updateTime!= null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    sdf.setTimeZone(TimeZone.getDefault());
+                    tvTime.setText(sdf.format(updateTime));
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // --- Age live ---
         if (tvAge!= null) {
             Date updateTime = null;
             try { updateTime = tx.getUpdateTime(); } catch (Exception ignored) {}
             tvAge.setText(formatAge(updateTime));
         }
+
+        // --- QR live includes blocks, RBF, time ---
         updateLiveQr();
     }
 
