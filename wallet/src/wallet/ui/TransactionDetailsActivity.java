@@ -1068,8 +1068,8 @@ public class TransactionDetailsActivity extends Activity {
         sb.append(getString(R.string.qr_ago));
         return sb.toString();
     }
-
-    /**
+    
+     /**
      * Refresh live UI fields that change over time or with chain updates:
      * - Status (pending/building/confirmed) based on depth
      * - Confirmation height string as txBlock / currentBlock OFFLINE
@@ -1089,21 +1089,13 @@ public class TransactionDetailsActivity extends Activity {
             try { txBlockHeight = confidence.getAppearedAtChainHeight(); } catch (Exception ignored) {}
         }
 
-        // --- Current chain height OFFLINE - NO API ---
+        // --- Current chain height OFFLINE - NO API - ONLY wallet.getLastBlockSeenHeight() ---
         int currentBlockHeight = 0;
         try {
             if (wallet!= null) {
                 currentBlockHeight = wallet.getLastBlockSeenHeight();
             }
         } catch (Exception ignored) {}
-        if (currentBlockHeight <= 0) {
-            try {
-                WalletApplication app = (WalletApplication) getApplication();
-                if (app!= null && app.getBlockChain()!= null && app.getBlockChain().getChainHead()!= null) {
-                    currentBlockHeight = app.getBlockChain().getChainHead().getHeight();
-                }
-            } catch (Exception ignored) {}
-        }
 
         // --- Status live ---
         String statusText;
@@ -1125,14 +1117,14 @@ public class TransactionDetailsActivity extends Activity {
         String confStr;
         if (depth <= 0) {
             confStr = getString(R.string.tx_details_unconfirmed);
-            if (currentBlockHeight > 0) {
-                confStr = confStr + " · " + currentBlockHeight;
-            }
         } else {
+            // Dùng string đã có sẵn: R.string.tx_details_confirmations_value = "%1$d xác nhận · khối %2$d"
+            // Thêm /currentBlockHeight để thành khối giao dịch / khối hiện tại
+            String base = getString(R.string.tx_details_confirmations_value, depth, txBlockHeight);
             if (currentBlockHeight > 0 && txBlockHeight > 0) {
-                confStr = depth + " " + getString(R.string.tx_details_confirmations_label) + " · khối " + txBlockHeight + "/" + currentBlockHeight;
+                confStr = base + "/" + currentBlockHeight;
             } else {
-                confStr = getString(R.string.tx_details_confirmations_value, depth, txBlockHeight);
+                confStr = base;
             }
         }
         tvHeight.setText(confStr);
@@ -1163,7 +1155,7 @@ public class TransactionDetailsActivity extends Activity {
             }
         } catch (Exception ignored) {}
 
-        // --- Time OFFLINE SYSTEM - NO API - update live formatting with system timezone ---
+        // --- Time OFFLINE SYSTEM - NO API ---
         try {
             if (tvTime!= null) {
                 Date updateTime = null;
