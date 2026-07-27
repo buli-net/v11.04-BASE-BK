@@ -1118,8 +1118,8 @@ public class TransactionDetailsActivity extends Activity {
         if (depth <= 0) {
             confStr = getString(R.string.tx_details_unconfirmed);
         } else {
-            // Dùng string đã có sẵn: R.string.tx_details_confirmations_value = "%1$d xác nhận · khối %2$d"
-            // Thêm /currentBlockHeight để thành khối giao dịch / khối hiện tại
+            
+            // Add /currentBlockHeight
             String base = getString(R.string.tx_details_confirmations_value, depth, txBlockHeight);
             if (currentBlockHeight > 0 && txBlockHeight > 0) {
                 confStr = base + "/" + currentBlockHeight;
