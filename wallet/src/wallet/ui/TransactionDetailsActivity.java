@@ -1068,7 +1068,7 @@ public class TransactionDetailsActivity extends Activity {
         sb.append(getString(R.string.qr_ago));
         return sb.toString();
     }
-    
+
      /**
      * Refresh live UI fields that change over time or with chain updates:
      * - Status (pending/building/confirmed) based on depth
