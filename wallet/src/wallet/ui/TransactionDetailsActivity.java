@@ -631,45 +631,17 @@ public class TransactionDetailsActivity extends Activity {
     }
 
     // --- Choose mempool API base URL depending on network (mainnet/testnet/signet/regtest/custom) ---
-    // FIX: ưu tiên lấy từ strings.xml để không set cứng, fallback về hằng số cũ
+        // --- Choose mempool API base URL depending on network (mainnet/testnet/signet/regtest/custom) ---
     private String getMempoolBaseUrl() {
-        // 1. Custom từ strings.xml
-        try {
-            String customStr = getString(R.string.mempool_api_custom);
-            if (customStr!= null &&!customStr.trim().isEmpty() &&!customStr.equalsIgnoreCase("null")) {
-                return customStr.endsWith("/")? customStr : customStr + "/";
-            }
-        } catch (Exception ignored) {}
         if (API_CUSTOM!= null &&!API_CUSTOM.isEmpty()) {
             return API_CUSTOM.endsWith("/")? API_CUSTOM : API_CUSTOM + "/";
         }
         try {
             String id = params.getId().toLowerCase(Locale.US);
-            if (id.contains("signet")) {
-                try {
-                    String s = getString(R.string.mempool_api_signet);
-                    if (s!= null &&!s.trim().isEmpty()) return s.endsWith("/")? s : s + "/";
-                } catch (Exception ignored) {}
-                return API_SIGNET;
-            } else if (id.contains("test")) {
-                try {
-                    String s = getString(R.string.mempool_api_testnet);
-                    if (s!= null &&!s.trim().isEmpty()) return s.endsWith("/")? s : s + "/";
-                } catch (Exception ignored) {}
-                return API_TESTNET;
-            } else if (id.contains("regtest")) {
-                try {
-                    String s = getString(R.string.mempool_api_regtest);
-                    if (s!= null &&!s.trim().isEmpty()) return s.endsWith("/")? s : s + "/";
-                } catch (Exception ignored) {}
-                return null;
-            } else {
-                try {
-                    String s = getString(R.string.mempool_api_mainnet);
-                    if (s!= null &&!s.trim().isEmpty()) return s.endsWith("/")? s : s + "/";
-                } catch (Exception ignored) {}
-                return API_MAINNET;
-            }
+            if (id.contains("signet")) return API_SIGNET;
+            else if (id.contains("test")) return API_TESTNET;
+            else if (id.contains("regtest")) return null;
+            else return API_MAINNET;
         } catch (Exception e) { return API_MAINNET; }
     }
 
@@ -752,7 +724,6 @@ public class TransactionDetailsActivity extends Activity {
     }
 
     // --- Recalculate fee if we now know all input values (offline or from cache) ---
-    // FIX: ưu tiên offline trước, mới fallback api cache
     private void tryUpdateFee() {
         try {
             if (tx == null || tx.getInputs() == null || tx.getOutputs() == null) return;
@@ -792,7 +763,7 @@ public class TransactionDetailsActivity extends Activity {
                 }
             }
 
-            // 2. FALLBACK API CACHE nếu offline thiếu
+            // 2. FALLBACK API CACHE
             if (inputValueCache.size() < tx.getInputs().size()) return;
 
             Coin totalIn = Coin.ZERO;
