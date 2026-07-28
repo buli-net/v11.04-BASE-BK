@@ -527,6 +527,8 @@
 <string name="tx_details_size_weight">Size / Weight</string>
 <string name="tx_details_confirmations">Confirmations</string>
 <string name="tx_details_time">Time</string>
+<string name="tx_details_current_time">Current time</string>
+<string name="qr_current_time">Current time</string>
 <string name="tx_details_age">Age</string>
 <string name="tx_details_send_receive_details">Send / Receive Details</string>
 <string name="tx_details_sent_details">Sent Details</string>
