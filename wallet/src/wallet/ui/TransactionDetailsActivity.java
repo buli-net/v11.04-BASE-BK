@@ -117,6 +117,7 @@ public class TransactionDetailsActivity extends Activity {
     private TextView tvActualFrom, tvActualTo;
     private ImageView ivQr; // Small transparent QR in layout
     private Bitmap currentQrBitmap; // Cached big QR for save/share
+    private TextView tvCurrentTime; // NEW: current system time offline
 
     // --- Wallet state ---
     private Transaction tx;
@@ -185,6 +186,7 @@ public class TransactionDetailsActivity extends Activity {
         tvActualFrom = findViewById(R.id.tv_actual_from);
         tvActualTo = findViewById(R.id.tv_actual_to);
         ivQr = findViewById(R.id.iv_tx_qr);
+        tvCurrentTime = findViewById(R.id.tv_current_time); // may not exist in old layout, handle null below
 
         // --- Right-align detail fields for consistent column layout ---
         if (tvStatus!= null) { tvStatus.setGravity(Gravity.END); tvStatus.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
@@ -193,6 +195,7 @@ public class TransactionDetailsActivity extends Activity {
         if (tvHeight!= null) { tvHeight.setGravity(Gravity.END); tvHeight.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
         if (tvMeta!= null) { tvMeta.setGravity(Gravity.END); tvMeta.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
         if (tvAge!= null) { tvAge.setGravity(Gravity.END); tvAge.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
+        if (tvCurrentTime!= null) { tvCurrentTime.setGravity(Gravity.END); tvCurrentTime.setTextAlignment(TextView.TEXT_ALIGNMENT_VIEW_END); }
 
         // --- Get txid from intent ---
         String txidStr = getIntent().getStringExtra("txid");
@@ -628,16 +631,45 @@ public class TransactionDetailsActivity extends Activity {
     }
 
     // --- Choose mempool API base URL depending on network (mainnet/testnet/signet/regtest/custom) ---
+    // FIX: ưu tiên lấy từ strings.xml để không set cứng, fallback về hằng số cũ
     private String getMempoolBaseUrl() {
+        // 1. Custom từ strings.xml
+        try {
+            String customStr = getString(R.string.mempool_api_custom);
+            if (customStr!= null &&!customStr.trim().isEmpty() &&!customStr.equalsIgnoreCase("null")) {
+                return customStr.endsWith("/")? customStr : customStr + "/";
+            }
+        } catch (Exception ignored) {}
         if (API_CUSTOM!= null &&!API_CUSTOM.isEmpty()) {
             return API_CUSTOM.endsWith("/")? API_CUSTOM : API_CUSTOM + "/";
         }
         try {
             String id = params.getId().toLowerCase(Locale.US);
-            if (id.contains("signet")) return API_SIGNET;
-            else if (id.contains("test")) return API_TESTNET;
-            else if (id.contains("regtest")) return null;
-            else return API_MAINNET;
+            if (id.contains("signet")) {
+                try {
+                    String s = getString(R.string.mempool_api_signet);
+                    if (s!= null &&!s.trim().isEmpty()) return s.endsWith("/")? s : s + "/";
+                } catch (Exception ignored) {}
+                return API_SIGNET;
+            } else if (id.contains("test")) {
+                try {
+                    String s = getString(R.string.mempool_api_testnet);
+                    if (s!= null &&!s.trim().isEmpty()) return s.endsWith("/")? s : s + "/";
+                } catch (Exception ignored) {}
+                return API_TESTNET;
+            } else if (id.contains("regtest")) {
+                try {
+                    String s = getString(R.string.mempool_api_regtest);
+                    if (s!= null &&!s.trim().isEmpty()) return s.endsWith("/")? s : s + "/";
+                } catch (Exception ignored) {}
+                return null;
+            } else {
+                try {
+                    String s = getString(R.string.mempool_api_mainnet);
+                    if (s!= null &&!s.trim().isEmpty()) return s.endsWith("/")? s : s + "/";
+                } catch (Exception ignored) {}
+                return API_MAINNET;
+            }
         } catch (Exception e) { return API_MAINNET; }
     }
 
@@ -720,30 +752,48 @@ public class TransactionDetailsActivity extends Activity {
     }
 
     // --- Recalculate fee if we now know all input values (offline or from cache) ---
+    // FIX: ưu tiên offline trước, mới fallback api cache
     private void tryUpdateFee() {
         try {
             if (tx == null || tx.getInputs() == null || tx.getOutputs() == null) return;
-            if (inputValueCache.size() < tx.getInputs().size()) {
-                Coin totalInOffline = Coin.ZERO;
-                boolean hasAll = true;
-                for (int i = 0; i < tx.getInputs().size(); i++) {
-                    TransactionInput in = tx.getInputs().get(i);
-                    TransactionOutput conn = getConnectedOutput(in);
-                    Coin v = null;
-                    if (conn!= null) v = conn.getValue();
-                    if (v == null) v = inputValueCache.get(i);
-                    if (v == null) { hasAll = false; break; }
-                    totalInOffline = totalInOffline.add(v);
-                }
-                if (!hasAll) return;
+
+            // 1. OFFLINE FIRST: thử tính từ connected outputs trong wallet
+            Coin totalInOffline = Coin.ZERO;
+            boolean offlineHasAll = true;
+            for (int i = 0; i < tx.getInputs().size(); i++) {
+                TransactionInput in = tx.getInputs().get(i);
+                TransactionOutput conn = getConnectedOutput(in);
+                Coin v = null;
+                if (conn!= null) v = conn.getValue();
+                // nếu offline không có thì tạm lấy cache api nếu có
+                if (v == null) v = inputValueCache.get(i);
+                if (v == null) { offlineHasAll = false; break; }
+                totalInOffline = totalInOffline.add(v);
+            }
+            if (offlineHasAll) {
                 Coin totalOut = Coin.ZERO;
                 for (TransactionOutput out : tx.getOutputs()) if (out.getValue()!= null) totalOut = totalOut.add(out.getValue());
                 if (!totalInOffline.isZero() && totalInOffline.isGreaterThan(totalOut)) {
                     Coin fee = totalInOffline.subtract(totalOut);
                     tvFee.setText(fee.toPlainString() + getString(R.string.tx_details_btc_suffix));
+                    int weight = 0;
+                    try { weight = tx.getWeight(); } catch (Exception ignored) {}
+                    if (weight > 0) {
+                        long satPerVbyte = fee.getValue() * 4 / weight;
+                        String currentMeta = getTv(tvMeta);
+                        String feeRateStr = satPerVbyte + getString(R.string.tx_details_fee_rate_suffix);
+                        if (!currentMeta.contains(feeRateStr) &&!currentMeta.contains(getString(R.string.tx_details_fee_rate_suffix))) {
+                            tvMeta.setText(currentMeta + " · " + satPerVbyte + getString(R.string.tx_details_fee_rate_suffix));
+                        } else if (!currentMeta.contains(getString(R.string.tx_details_fee_rate_suffix))) {
+                            tvMeta.setText(currentMeta + " · " + satPerVbyte + getString(R.string.tx_details_fee_rate_suffix));
+                        }
+                    }
+                    return;
                 }
-                return;
             }
+
+            // 2. FALLBACK API CACHE nếu offline thiếu
+            if (inputValueCache.size() < tx.getInputs().size()) return;
 
             Coin totalIn = Coin.ZERO;
             for (Coin c : inputValueCache.values()) if (c!= null) totalIn = totalIn.add(c);
@@ -799,6 +849,7 @@ public class TransactionDetailsActivity extends Activity {
     // --- Build full text that will be encoded into QR (live fields included) ---
     private String buildLiveTxText() {
         String ageStr = getTv(tvAge);
+        String currentTimeStr = tvCurrentTime!= null? getTv(tvCurrentTime) : "";
         return getString(R.string.qr_direction) + ": " + getTv(tvDirection) + "\n"
             + getString(R.string.qr_amount) + ": " + getTv(tvAmount) + "\n\n"
             + getString(R.string.qr_sender_receiver) + "\n"
@@ -810,6 +861,7 @@ public class TransactionDetailsActivity extends Activity {
             + getString(R.string.qr_size_weight) + ": " + getTv(tvMeta) + "\n"
             + getString(R.string.qr_confirmations) + ": " + getTv(tvHeight) + "\n"
             + getString(R.string.qr_time) + ": " + getTv(tvTime) + "\n"
+            + getString(R.string.qr_current_time) + ": " + currentTimeStr + "\n"
             + getString(R.string.qr_age) + ": " + ageStr + "\n\n"
             + getString(R.string.qr_sent_details) + "\n" + getTv(tvFrom) + "\n\n"
             + getString(R.string.qr_received_details) + "\n" + getTv(tvTo) + "\n\n"
@@ -1118,8 +1170,6 @@ public class TransactionDetailsActivity extends Activity {
         if (depth <= 0) {
             confStr = getString(R.string.tx_details_unconfirmed);
         } else {
-            
-            // Add /currentBlockHeight
             String base = getString(R.string.tx_details_confirmations_value, depth, txBlockHeight);
             if (currentBlockHeight > 0 && txBlockHeight > 0) {
                 confStr = base + "/" + currentBlockHeight;
@@ -1129,7 +1179,7 @@ public class TransactionDetailsActivity extends Activity {
         }
         tvHeight.setText(confStr);
 
-        // --- Size / Weight / RBF LIVE OFFLINE - NO API ---
+        // --- Size / Weight / RBF LIVE OFFLINE + FEE RATE PRIORITY OFFLINE THEN API ---
         try {
             int size = 0;
             int weight = 0;
@@ -1138,8 +1188,47 @@ public class TransactionDetailsActivity extends Activity {
             try { weight = tx.getWeight(); } catch (Exception ignored) {}
             try { rbf = tx.isOptInFullRBF(); } catch (Exception ignored) {}
 
+            // 1. OFFLINE FIRST
             Coin fee = null;
             try { fee = tx.getFee(); } catch (Exception ignored) {}
+
+            if (fee == null) {
+                // thử tính offline từ connected outputs
+                try {
+                    Coin totalInOffline = Coin.ZERO;
+                    boolean hasAll = true;
+                    for (int i = 0; i < tx.getInputs().size(); i++) {
+                        TransactionInput in = tx.getInputs().get(i);
+                        TransactionOutput conn = getConnectedOutput(in);
+                        Coin v = null;
+                        if (conn!= null) v = conn.getValue();
+                        if (v == null) { hasAll = false; break; }
+                        totalInOffline = totalInOffline.add(v);
+                    }
+                    if (hasAll) {
+                        Coin totalOut = Coin.ZERO;
+                        for (TransactionOutput out : tx.getOutputs()) if (out.getValue()!= null) totalOut = totalOut.add(out.getValue());
+                        if (!totalInOffline.isZero() && totalInOffline.isGreaterThan(totalOut)) {
+                            fee = totalInOffline.subtract(totalOut);
+                        }
+                    }
+                } catch (Exception ignored2) {}
+            }
+
+            // 2. FALLBACK API CACHE nếu offline vẫn null
+            if (fee == null) {
+                try {
+                    if (inputValueCache.size() >= tx.getInputs().size()) {
+                        Coin totalIn = Coin.ZERO;
+                        for (Coin c : inputValueCache.values()) if (c!= null) totalIn = totalIn.add(c);
+                        Coin totalOut = Coin.ZERO;
+                        for (TransactionOutput out : tx.getOutputs()) if (out.getValue()!= null) totalOut = totalOut.add(out.getValue());
+                        if (!totalIn.isZero() && totalIn.isGreaterThan(totalOut)) {
+                            fee = totalIn.subtract(totalOut);
+                        }
+                    }
+                } catch (Exception ignored3) {}
+            }
 
             String feeRate = "";
             if (fee!= null && weight > 0) {
@@ -1165,6 +1254,16 @@ public class TransactionDetailsActivity extends Activity {
                     sdf.setTimeZone(TimeZone.getDefault());
                     tvTime.setText(sdf.format(updateTime));
                 }
+            }
+        } catch (Exception ignored) {}
+
+        // --- NEW: Current system time OFFLINE - NO API ---
+        try {
+            if (tvCurrentTime!= null) {
+                SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                sdfNow.setTimeZone(TimeZone.getDefault());
+                String nowStr = sdfNow.format(new Date()); // System.currentTimeMillis() offline
+                tvCurrentTime.setText(nowStr);
             }
         } catch (Exception ignored) {}
 
@@ -1268,6 +1367,7 @@ public class TransactionDetailsActivity extends Activity {
                                 getString(R.string.tx_details_size_weight) + ": " + getTv(tvMeta) + "\n" +
                                 getString(R.string.tx_details_confirmations) + ": " + getTv(tvHeight) + "\n" +
                                 getString(R.string.tx_details_time) + ": " + getTv(tvTime) + "\n" +
+                                getString(R.string.tx_details_current_time) + ": " + (tvCurrentTime!= null? getTv(tvCurrentTime) : "") + "\n" +
                                 getString(R.string.tx_details_age) + ": " + getTv(tvAge);
                         copy(full);
                     } else if (v == cardIo) {
@@ -1291,6 +1391,7 @@ public class TransactionDetailsActivity extends Activity {
                     getString(R.string.tx_details_size_weight) + ": " + getTv(tvMeta) + "\n" +
                     getString(R.string.tx_details_confirmations) + ": " + getTv(tvHeight) + "\n" +
                     getString(R.string.tx_details_time) + ": " + getTv(tvTime) + "\n" +
+                    getString(R.string.tx_details_current_time) + ": " + (tvCurrentTime!= null? getTv(tvCurrentTime) : "") + "\n" +
                     getString(R.string.tx_details_age) + ": " + getTv(tvAge);
             copy(full);
         });
