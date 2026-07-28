@@ -527,6 +527,8 @@
 <string name="tx_details_size_weight">Kích thước / Trọng số</string>
 <string name="tx_details_confirmations">Số xác nhận</string>
 <string name="tx_details_time">Thời gian</string>
+<string name="tx_details_current_time">Giờ hiện tại</string>
+<string name="qr_current_time">Giờ hiện tại</string>
 <string name="tx_details_age">Tuổi</string>
 <string name="tx_details_send_receive_details">Chi tiết gửi / nhận</string>
 <string name="tx_details_sent_details">Chi tiết đã gửi</string>
