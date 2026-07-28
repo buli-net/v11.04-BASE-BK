@@ -432,6 +432,36 @@
 
                         </LinearLayout>
 
+                        <!-- FIX: ADD CURRENT TIME OFFLINE -->
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:focusable="false">
+
+                            <TextView
+                                android:text="@string/tx_details_current_time"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="120dp"
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
+
+                            <TextView
+                                android:id="@+id/tv_current_time"
+                                android:textSize="14sp"
+                                android:textColor="@color/tx_text_secondary"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:clickable="false"
+                                android:focusable="false" />
+
+                        </LinearLayout>
+
                         <LinearLayout
                             android:orientation="horizontal"
                             android:layout_marginTop="8dp"
