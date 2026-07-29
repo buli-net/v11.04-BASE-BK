@@ -129,7 +129,7 @@
 
         <!-- fix theme setting -->
 <style name="My.Preference" parent="@android:style/Theme.Material.Light">
- <!--   <item name="android:colorBackground">@color/bg_level1</item>
+    <item name="android:colorBackground">@color/bg_level1</item>
     <item name="android:colorPrimary">@color/bg_action_bar</item>
     <item name="android:colorPrimaryDark">@color/bg_action_bar</item>
     <item name="android:statusBarColor">@color/bg_action_bar</item>
@@ -151,7 +151,7 @@
     <item name="android:popupMenuStyle">@style/My.Widget.PopupMenu</item>
       
 </style>
-<!--
+
     
 <style name="My.Preference.ActionBarTheme" parent="@android:style/ThemeOverlay.Material.ActionBar">
     <item name="android:colorControlNormal">@color/fg_on_dark_bg_network_significant</item>
@@ -164,7 +164,7 @@
     <item name="android:paddingLeft">@dimen/list_entry_padding_horizontal_cram</item>
     <item name="android:paddingRight">@dimen/list_entry_padding_horizontal_cram</item>
 </style>
-    -->
+    
  <style name="My.Preference.ActionBar.Title" parent="@android:style/TextAppearance.Material.Widget.ActionBar.Title">
     <item name="android:textColor">@color/fg_on_dark_bg_network_significant</item>
     <item name="android:textStyle">bold</item>
